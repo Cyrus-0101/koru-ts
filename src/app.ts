@@ -1,4 +1,4 @@
-import { KoruTSEngine } from "./engine";
+import { KoruTSEngine } from "./core/engine";
 
 let engine: KoruTSEngine;
 
@@ -8,3 +8,7 @@ window.onload = function () {
 
   engine.start();
 };
+
+// window.onresize = function () {
+//   engine.resize();
+// };
