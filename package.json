@@ -2,7 +2,7 @@
   "name": "koru-ts",
   "private": true,
   "scripts": {
-    "build": "bun build ./app.ts --watch --outfile=./dist/main.js"
+    "build": "bun build ./src/app.ts --watch --outfile=./dist/main.js"
   },
   "devDependencies": {
     "@types/bun": "latest"
