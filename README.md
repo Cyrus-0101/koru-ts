@@ -1,15 +1,143 @@
-# koru-ts
+# KoruTS Game Engine
 
-To install dependencies:
+A WebGL-based TypeScript game engine focusing on 2D/3D rendering with modern web technologies.
+
+## Architecture
+
+### Core Components
+
+- [`KoruTSEngine`](src/core/engine.ts): Main engine class managing:
+
+  - WebGL context and rendering pipeline
+  - Game loop
+  - Shader management
+  - Buffer handling
+  - Window resize events
+
+- [`GLUtilities`](src/core/gl/gl.ts): WebGL initialization and context management
+
+  - Canvas creation/initialization
+  - WebGL context setup
+  - Error handling
+
+- [`Shader`](src/core/gl/shaders.ts): GLSL shader program management
+  - Vertex/Fragment shader compilation
+  - Program linking
+  - Shader activation
+
+### Current Features
+
+1. **WebGL Context Management**
+
+   - Automatic canvas creation
+   - WebGL context initialization
+   - Error handling for unsupported browsers
+
+2. **Shader System**
+
+   - GLSL shader compilation
+   - Program linking
+   - Basic vertex and fragment shaders
+   - Attribute handling
+
+3. **Rendering Pipeline**
+
+   - Vertex buffer creation
+   - Attribute pointer configuration
+   - Basic triangle rendering
+   - Frame clearing and buffer management
+
+4. **Window Management**
+   - Responsive canvas sizing
+   - Window resize handling
+   - Fullscreen support
+
+## Technical Implementation
+
+### WebGL References
+
+- [WebGL Context](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext)
+- [Shader Programs](https://developer.mozilla.org/en-US/docs/Web/API/WebGLProgram)
+- [Buffer Objects](https://developer.mozilla.org/en-US/docs/Web/API/WebGLBuffer)
+- [Attribute Pointers](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/vertexAttribPointer)
+
+### Current Shader Implementation
+
+```glsl
+// Vertex Shader
+attribute vec3 a_position;
+
+void main() {
+    gl_Position = vec4(a_position, 1.0);
+}
+
+// Fragment Shader
+precision mediump float;
+
+void main() {
+    gl_FragColor = vec4(1.0);
+}
+```
+
+### File Structure
+
+```
+src/
+├── core/
+│   ├── engine.ts       # Main engine implementation
+│   └── gl/
+│       ├── gl.ts       # WebGL utilities
+│       └── shaders.ts  # Shader management
+└── app.ts             # Application entry point
+```
+
+## Getting Started
+
+1. Install dependencies:
 
 ```bash
 bun install
 ```
 
-To run:
+2. Build the project:
 
 ```bash
-bun run 
+bun run build
 ```
 
-This project was created using `bun init` in bun v1.2.3. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+3. Open `index.html` in a browser to see a white triangle rendered on a black background.
+
+## Current Status
+
+The engine currently demonstrates:
+
+- Basic WebGL setup and initialization
+- Shader compilation and management
+- Simple geometry rendering (triangle)
+- Game loop implementation
+- Basic window management
+
+## Next Steps
+
+- [ ] Add texture support
+- [ ] Implement camera system
+- [ ] Add basic 2D sprite rendering
+- [ ] Implement basic physics
+- [ ] Add input handling
+- [ ] Implement scene graph
+- [ ] Add asset loading system
+
+## Development
+
+Built with:
+
+- TypeScript
+- WebGL
+- Bun v1.2.3 (for building and development)
+
+## References
+
+- [WebGL Fundamentals](https://webglfundamentals.org/)
+- [MDN WebGL API](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API)
+- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
+- [WebGL Rendering Context](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/vertexAttribPointer)
