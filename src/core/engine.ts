@@ -21,6 +21,9 @@ export class KoruTSEngine {
   /** Basic shader program for rendering */
   private _shader!: Shader;
 
+  /** Container for data to be pushed in the graphics card, to be used in the vertex shader */
+  private _buffer!: WebGLBuffer;
+
   /**
    * Creates a new engine instance
    * Note: Actual initialization happens in start()
@@ -45,23 +48,83 @@ export class KoruTSEngine {
     this.loadShaders();
     this._shader.use();
 
+    this.createBuffer();
+
+    this.resize();
+
     // Start the main game loop
     this.loop();
   }
 
   /**
    * Main game loop
-   * Handles:
-   * - Clearing the screen
-   * - Rendering objects
-   * - Scheduling next frame
+   * Handles the rendering pipeline for each frame:
+   * 1. Clear previous frame
+   * 2. Bind vertex buffer
+   * 3. Draw geometry
+   * 4. Request next animation frame
    */
   private loop(): void {
-    // Clear the canvas for next frame
+    // Clear the color buffer to remove previous frame
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    // Schedule next frame
+    // Bind our vertex buffer to the GL_ARRAY_BUFFER target
+    gl.bindBuffer(gl.ARRAY_BUFFER, this._buffer);
+
+    gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
+
+    gl.enableVertexAttribArray(0);
+
+    // Draw triangles using the bound buffer
+    // Parameters: primitive type, starting offset, number of vertices
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+    // Schedule next frame using requestAnimationFrame
+    // bind(this) ensures correct 'this' context in the callback
     requestAnimationFrame(this.loop.bind(this));
+  }
+
+  /**
+   * Creates and initializes vertex buffer object (VBO)
+   * Sets up a simple triangle in normalized device coordinates:
+   * - Coordinates range from -1 to 1
+   * - (0,0) is the center of the screen
+   * - Each vertex has X, Y, Z components
+   */
+  private createBuffer(): void {
+    // Create a new buffer object in GPU memory
+    this._buffer = gl.createBuffer();
+
+    // Define vertex data for a triangle
+    // Each vertex is defined by 3 components (x, y, z)
+    let vertices = [
+      // x,   y,   z
+      0.0,
+      0.0,
+      0.0, // Vertex 1: bottom-left
+      0.0,
+      0.5,
+      0.0, // Vertex 2: top-left
+      0.5,
+      0.5,
+      0.0, // Vertex 3: top-right
+    ];
+
+    // Bind the buffer to the GL_ARRAY_BUFFER target
+    gl.bindBuffer(gl.ARRAY_BUFFER, this._buffer);
+
+    gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
+
+    gl.enableVertexAttribArray(0);
+
+    // Upload vertex data to the buffer
+    // Float32Array is used because GLSL expects 32-bit floats
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+
+    // Unbind the buffer to prevent accidental modifications
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+    gl.disableVertexAttribArray(0);
   }
 
   /**
@@ -71,7 +134,10 @@ export class KoruTSEngine {
   public resize(): void {
     if (this._canvas !== undefined) {
       this._canvas.width = window.innerWidth;
-      this._canvas.height = window.innerWidth;
+      this._canvas.height = window.innerHeight;
+
+      // Normalized Device coordinates - how webGL represents triangles
+      gl.viewport(0, 0, window.innerWidth, window.innerHeight);
     }
   }
 
