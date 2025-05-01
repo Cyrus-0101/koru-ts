@@ -6,24 +6,81 @@ A WebGL-based TypeScript game engine focusing on 2D/3D rendering with modern web
 
 ### Core Components
 
-- [`KoruTSEngine`](src/core/engine.ts): Main engine class managing:
+#### [`KoruTSEngine`](src/core/engine.ts):
 
-  - WebGL context and rendering pipeline
-  - Game loop
-  - Shader management
-  - Buffer handling
-  - Window resize events
+Main engine class orchestrating the game loop and rendering pipeline.
 
-- [`GLUtilities`](src/core/gl/gl.ts): WebGL initialization and context management
+**Responsibilities:**
 
-  - Canvas creation/initialization
-  - WebGL context setup
-  - Error handling
+- Manages WebGL context and rendering pipeline
+- Controls game loop timing and execution
+- Handles shader program lifecycle
+- Manages vertex buffer operations
+- Responds to window resize events
 
-- [`Shader`](src/core/gl/shaders.ts): GLSL shader program management
-  - Vertex/Fragment shader compilation
-  - Program linking
-  - Shader activation
+**Example:**
+
+```typescript
+const engine = new KoruTSEngine();
+engine.start(); // Initializes WebGL and starts game loop
+```
+
+#### [`GLUtilities`](src/core/gl/gl.ts)
+
+Static utility class for WebGL context management.
+
+**Responsibilities:**
+
+- Handles canvas element creation and setup
+- Initializes WebGL context with error checking
+- Provides fallback handling for WebGL support
+- Manages context attributes and extension
+
+**Example**
+
+```typescript
+const canvas = GLUtilities.initialize(); // Creates canvas & WebGL context
+```
+
+#### [`GLBuffer`](src/core/gl/glBuffer.ts)
+
+Manages vertex buffer objects and attribute configurations.
+
+**Responsibilities:**
+
+- Creates and manages VBOs
+- Handles different data types (Float32, Int16, etc.)
+- Configures vertex attribute layouts
+- Manages buffer memory and uploads
+- Supports multiple drawing primitives
+
+**Example**
+
+```typescript
+   const buffer = new GLBuffer(3);  // 3 components per vertex (x,y,z)
+   buffer.addAttributeLocation(new AttributeInfo(0, 3, 0));  // position attribute
+   buffer.pushBackData([0.0, 0.5, 0.0, ...]);  // Add vertex data
+   buffer.upload();  // Send to GPU
+```
+
+#### [`Shader`](src/core/gl/shaders.ts)
+
+GLSL shader program management and compilation.
+
+**Responsibilities:**
+
+- Compiles vertex and fragment shaders
+- Links shader programs
+- Manages uniform locations
+- Handles attribute bindings
+- Provides error checking and logging
+
+**Example**
+
+```typescript
+const shader = new Shader("basic", vertexShaderSource, fragmentShaderSource);
+shader.use(); // Activate shader for rendering
+```
 
 ### Current Features
 
@@ -66,13 +123,6 @@ How WebGL Works:
    The GPU processes the data and shaders, rendering the 3D scene efficiently and providing high-performance graphics.
 5. Display:
    The rendered 3D graphics are then displayed within the HTML5 `<canvas>` element.
-
-### WebGL References
-
-- [WebGL Context](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext)
-- [Shader Programs](https://developer.mozilla.org/en-US/docs/Web/API/WebGLProgram)
-- [Buffer Objects](https://developer.mozilla.org/en-US/docs/Web/API/WebGLBuffer)
-- [Attribute Pointers](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/vertexAttribPointer)
 
 ### v1 Shader Implementation
 
@@ -202,7 +252,11 @@ Built with:
 
 ## References
 
+- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
 - [WebGL Fundamentals](https://webglfundamentals.org/)
 - [MDN WebGL API](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API)
-- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
 - [WebGL Rendering Context](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/vertexAttribPointer)
+- [WebGL Context](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext)
+- [Shader Programs](https://developer.mozilla.org/en-US/docs/Web/API/WebGLProgram)
+- [Buffer Objects](https://developer.mozilla.org/en-US/docs/Web/API/WebGLBuffer)
+- [Attribute Pointers](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/vertexAttribPointer)
