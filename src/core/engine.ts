@@ -1,6 +1,7 @@
 import { gl, GLUtilities } from "./gl/gl";
 import { AttributeInfo, GLBuffer } from "./gl/glBuffer";
 import { Shader } from "./gl/shaders";
+import { Sprite } from "./graphics/sprite";
 
 /**
  * KoruTSEngine - Core Game Engine Class
@@ -29,12 +30,7 @@ export class KoruTSEngine {
    */
   private _shader!: Shader;
 
-  /**
-   * Vertex Buffer Object (VBO) storing geometry data
-   * Contains vertex positions for rendering
-   * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLBuffer
-   */
-  private _buffer!: GLBuffer;
+  private _sprite!: Sprite;
 
   /**
    * Creates a new engine instance
@@ -61,8 +57,9 @@ export class KoruTSEngine {
     this.loadShaders();
     this._shader.use();
 
-    // Create and initialize vertex buffer with geometry data
-    this.createBuffer();
+    // Load
+    this._sprite = new Sprite("test");
+    this._sprite.load();
 
     // Configure initial viewport and canvas size
     this.resize();
@@ -89,76 +86,11 @@ export class KoruTSEngine {
 
     gl.uniform4f(colorPosition, 1, 0.5, 0, 1);
 
-    this._buffer.bind();
-
-    this._buffer.draw();
+    this._sprite.draw();
 
     // Schedule next frame using requestAnimationFrame
     // bind(this) ensures correct 'this' context in the callback
     requestAnimationFrame(this.loop.bind(this));
-  }
-
-  /**
-   * Creates and initializes vertex buffer object (VBO)
-   * Sets up a simple triangle in normalized device coordinates:
-   * - Coordinates range from -1 to 1
-   * - (0,0) is the center of the screen
-   * - Each vertex has X, Y, Z components
-   * - Counter-clockwise winding order for front-facing triangles
-   */
-  private createBuffer(): void {
-    // Create a new buffer object in GPU memory with 3 components per vertex (x,y,z)
-    this._buffer = new GLBuffer(3);
-
-    // Configure vertex position attribute for the shader
-    let positionAttribute = new AttributeInfo();
-
-    // Get location of a_position attribute from shader program
-    positionAttribute.location =
-      this._shader.getAttributeLocation("a_position");
-
-    // Set offset to 0 (start of vertex data)
-    positionAttribute.offset = 0;
-
-    // Each position has 3 components (x, y, z)
-    positionAttribute.size = 3;
-
-    // Register attribute with buffer for automatic setup during binding
-    this._buffer.addAttributeLocation(positionAttribute);
-
-    // Define triangle vertices in counter-clockwise order
-    // Using normalized device coordinates (-1 to +1)
-    let vertices = [
-      // x,    y,    z
-      0.0,
-      0.0,
-      0.0, // Vertex 1: bottom-left - Element Buffer
-      0.0,
-      0.5,
-      0.0, // Vertex 2: top-left
-      0.5,
-      0.5,
-      0.0, // Vertex 3: top-right
-
-      // Drawing another triangle to draw a quad
-      0.5,
-      0.5,
-      0.0,
-      0.5,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-    ];
-
-    // Upload vertex data to GPU memory
-    this._buffer.pushBackData(vertices);
-
-    this._buffer.upload();
-
-    // Unbind buffer to prevent accidental modifications
-    this._buffer.unbind();
   }
 
   /**
