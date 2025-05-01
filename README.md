@@ -94,8 +94,6 @@ void main() {
 
 ### File Structure
 
-### File Structure
-
 ```
 src/
 ├── core/
