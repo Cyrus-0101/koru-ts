@@ -139,6 +139,17 @@ export class KoruTSEngine {
       0.5,
       0.5,
       0.0, // Vertex 3: top-right
+
+      // Drawing another triangle to draw a quad
+      0.5,
+      0.5,
+      0.0,
+      0.5,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
     ];
 
     // Upload vertex data to GPU memory
