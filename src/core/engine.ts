@@ -2,6 +2,7 @@ import { gl, GLUtilities } from "./gl/gl";
 import { AttributeInfo, GLBuffer } from "./gl/glBuffer";
 import { Shader } from "./gl/shaders";
 import { Sprite } from "./graphics/sprite";
+import { Matrix4x4 } from "./math/matrix4x4";
 
 /**
  * KoruTSEngine - Core Game Engine Class
@@ -9,9 +10,8 @@ import { Sprite } from "./graphics/sprite";
  * Responsible for:
  * - Managing the game loop
  * - Handling WebGL context
- * - Managing shaders
- * - Controlling render pipeline
- * - Handling window resizing
+ * - Resource loading and management
+ * - Scene rendering and updates
  *
  * WebGL References:
  * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API
@@ -30,7 +30,15 @@ export class KoruTSEngine {
    */
   private _shader!: Shader;
 
+  /** Sprite for rendering */
   private _sprite!: Sprite;
+
+  /**
+   * Projection matrix for transforming 3D coordinates to screen space
+   * Configured as orthographic projection for 2D rendering
+   * Maps world coordinates to normalized device coordinates (-1 to +1)
+   */
+  private _projection!: Matrix4x4;
 
   /**
    * Creates a new engine instance
@@ -41,10 +49,8 @@ export class KoruTSEngine {
   /**
    * Initializes and starts the game engine
    * - Sets up WebGL context and canvas
-   * - Configures initial render state and viewport
-   * - Loads and compiles shader programs
-   * - Creates vertex buffers
-   * - Begins the render loop
+   * - Shaders
+   * - Initial game objects
    */
   public start(): void {
     // Initialize WebGL context and get canvas reference
@@ -58,6 +64,16 @@ export class KoruTSEngine {
     this._shader.use();
 
     // Load
+    this._projection = Matrix4x4.orthographic(
+      0,
+      this._canvas.width,
+      0,
+      this._canvas.height,
+      -1.0,
+      100.0
+    );
+
+    // Create and load test sprite
     this._sprite = new Sprite("test");
     this._sprite.load();
 
@@ -72,10 +88,9 @@ export class KoruTSEngine {
    * Main game loop - Heart of the engine
    * Executes every frame (typically 60fps) and handles:
    * 1. Clear previous frame's render
-   * 2. Set up vertex attributes
-   * 3. Bind buffers and configure attributes
-   * 4. Draw geometry
-   * 5. Schedule next frame
+   * 2 Object updates
+   * 3 Rendering
+   * 4. Schedule next frame
    */
   private loop(): void {
     // Clear the color buffer to remove previous frame
@@ -84,8 +99,17 @@ export class KoruTSEngine {
     // Set uniforms
     let colorPosition = this._shader.getUniformLocation("u_color");
 
-    gl.uniform4f(colorPosition, 1, 0.5, 0, 1);
+    gl.uniform4f(colorPosition, 1, 0.5, 0, 1); // Orange color
 
+    let projectionPosition = this._shader.getUniformLocation("u_projection");
+
+    gl.uniformMatrix4fv(
+      projectionPosition,
+      false,
+      new Float32Array(this._projection.data)
+    );
+
+    // Draw Sprite
     this._sprite.draw();
 
     // Schedule next frame using requestAnimationFrame
@@ -103,7 +127,7 @@ export class KoruTSEngine {
       this._canvas.height = window.innerHeight;
 
       // Normalized Device coordinates - how webGL represents triangles
-      gl.viewport(0, 0, window.innerWidth, window.innerHeight);
+      gl.viewport(-1, 1, 1, -1);
     }
   }
 
@@ -118,8 +142,10 @@ export class KoruTSEngine {
     let vertexShaderSource = `
 attribute vec3 a_position;
 
+uniform mat4 u_projection;
+
 void main() {
-    gl_Position = vec4(a_position, 1.0);
+    gl_Position = u_projection * vec4(a_position, 1.0);
 }`;
 
     // Basic fragment shader that outputs white color
