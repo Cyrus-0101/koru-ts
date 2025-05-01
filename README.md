@@ -54,6 +54,18 @@ A WebGL-based TypeScript game engine focusing on 2D/3D rendering with modern web
 
 ## Technical Implementation
 
+How WebGL Works:
+1. JavaScript Control:
+WebGL is controlled through JavaScript, which sends commands to the browser's GPU. 
+2. Rendering Pipeline:
+WebGL utilizes a rendering pipeline, where vertices, shaders, and other data are processed by the GPU to create 3D graphics. 
+3. Shaders:
+Shaders, written in `GLSL`, define how objects are drawn, including their appearance, lighting, and other visual effects. 
+4. GPU Acceleration:
+The GPU processes the data and shaders, rendering the 3D scene efficiently and providing high-performance graphics. 
+5. Display:
+The rendered 3D graphics are then displayed within the HTML5 `<canvas>` element. 
+
 ### WebGL References
 
 - [WebGL Context](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext)
