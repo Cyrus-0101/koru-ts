@@ -1,8 +1,21 @@
 import { AttributeInfo, GLBuffer } from "../gl/glBuffer";
 
+/**
+ * Sprite class represents a 2D graphical object in the game
+ * Handles:
+ * - Vertex buffer creation and management
+ * - Attribute configuration
+ * - Drawing operations
+ * - Size and position management
+ */
 export class Sprite {
+  /** Unique identifier for this sprite */
   private _name: string;
+
+  /** Width in pixels/units */
   private _width: number;
+
+  /** Height in pixels/units */
   private _height: number;
 
   /**
@@ -12,12 +25,24 @@ export class Sprite {
    */
   private _buffer!: GLBuffer;
 
-  public constructor(name: string, width: number = 10, height: number = 10) {
+  /**
+   * Creates a new sprite instance
+   * @param name Unique identifier for this sprite
+   * @param width Width in pixels/units (default: 10)
+   * @param height Height in pixels/units (default: 10)
+   */
+  public constructor(name: string, width: number = 100, height: number = 100) {
     this._name = name;
     this._width = width;
     this._height = height;
   }
 
+  /**
+   * Initializes the sprite's graphics resources
+   * - Creates vertex buffer
+   * - Sets up attributes
+   * - Uploads vertex data to GPU
+   */
   public load(): void {
     // Create a new buffer object in GPU memory with 3 components per vertex (x,y,z)
     this._buffer = new GLBuffer(3);
@@ -37,30 +62,30 @@ export class Sprite {
     // Register attribute with buffer for automatic setup during binding
     this._buffer.addAttributeLocation(positionAttribute);
 
-    // Define triangle vertices in counter-clockwise order
-    // Using normalized device coordinates (-1 to +1)
+    // Define quad vertices using two triangles
+    // Counter-clockwise winding order for proper face culling
     let vertices = [
-      // x,    y,    z
+      // First triangle (bottom-left, top-left, top-right)
       0.0,
       0.0,
-      0.0, // Vertex 1: bottom-left - Element Buffer
+      0.0, // Vertex 1: bottom-left
       0.0,
-      0.5,
+      this._height,
       0.0, // Vertex 2: top-left
-      0.5,
-      0.5,
+      this._width,
+      this._height,
       0.0, // Vertex 3: top-right
 
-      // Drawing another triangle to draw a quad
-      0.5,
-      0.5,
+      // Second triangle (top-right, bottom-right, bottom-left)
+      this._width,
+      this._height,
+      0.0, // Vertex 4: top-right
+      this._width,
       0.0,
-      0.5,
+      0.0, // Vertex 5: bottom-right
       0.0,
       0.0,
-      0.0,
-      0.0,
-      0.0,
+      0.0, // Vertex 6: bottom-left
     ];
 
     // Upload vertex data to GPU memory
@@ -72,11 +97,19 @@ export class Sprite {
     this._buffer.unbind();
   }
 
+  /**
+   * Updates sprite state
+   * @param time Current game time in milliseconds
+   */
   public update(time: number): void {}
 
+  /**
+   * Renders the sprite using its vertex buffer
+   */
   public draw(): void {
+    // Bind buffer
     this._buffer.bind();
-
+    // Draw quad
     this._buffer.draw();
   }
 }
