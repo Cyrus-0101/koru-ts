@@ -20,6 +20,11 @@ export class Shader {
   /** WebGL program object that combines vertex and fragment shaders */
   private _program!: WebGLProgram;
 
+  /** HashMap with values for our attributes default {} */
+  private _attributes: { [name: string]: number } = {};
+
+  private _uniforms: { [name: string]: WebGLUniformLocation | null } = {};
+
   /**
    * Creates a new shader program
    * @param name Identifier for the shader program
@@ -38,6 +43,10 @@ export class Shader {
 
     // Create and link the shader program
     this.createProgram(vertexShader, fragmentShader);
+
+    this.detectAttributes();
+
+    this.detectUniforms();
   }
 
   /**
@@ -54,6 +63,35 @@ export class Shader {
    */
   public use(): void {
     gl.useProgram(this._program);
+  }
+
+  /**
+   * Gets the location of an attribute with the provided name.
+   * @param name - The name of the attribute location to retrieve
+   * @returns number -
+   */
+  public getAttributeLocation(name: string): number {
+    if (this._attributes[name] === undefined) {
+      throw new Error(
+        `Unable to find attribute named '${name}' in shader '${this._name}'`
+      );
+    }
+
+    return this._attributes[name];
+  }
+
+  /**
+   * Gets the location of a uniform with the provided name
+   * @param name The name of the uniform to retrieve
+   * @returns WebGLUniformLocation or null if not found
+   */
+  public getUniformLocation(name: string): WebGLUniformLocation | null {
+    if (this._uniforms[name] === undefined) {
+      throw new Error(
+        `Unable to find uniform named '${name}' in shader '${this._name}'`
+      );
+    }
+    return this._uniforms[name];
   }
 
   /**
@@ -107,6 +145,75 @@ export class Shader {
     let error = gl.getProgramInfoLog(this._program);
     if (error !== "") {
       throw new Error("Error linking shader: " + this._name + ": " + error);
+    }
+  }
+
+  /**
+   * Detects and stores all active attributes in the shader program
+   * Called during initialization to cache attribute locations for faster access
+   *
+   * WebGL References:
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getProgramParameter
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getActiveAttrib
+   * @private
+   */
+  private detectAttributes(): void {
+    // Get the number of active attributes in the shader program
+    let attributeCount = gl.getProgramParameter(
+      this._program,
+      gl.ACTIVE_ATTRIBUTES
+    );
+
+    // Iterate through all active attributes
+    for (let i = 0; i < attributeCount; i++) {
+      // Get information about the attribute at index i
+      let info = gl.getActiveAttrib(this._program, i);
+
+      if (!info) {
+        break;
+      }
+
+      // Store the attribute location in our map for quick lookup
+      // getAttribLocation returns the bound location of the attribute
+      this._attributes[info.name] = gl.getAttribLocation(
+        this._program,
+        info.name
+      );
+    }
+  }
+
+  /**
+   * Detects and stores all active uniforms in the shader program
+   * Uniforms are global GLSL variables that remain constant across all vertices
+   * Common uses: transformation matrices, lighting parameters, time variables
+   *
+   * WebGL References:
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getProgramParameter
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getActiveUniform
+   * @private
+   */
+  private detectUniforms(): void {
+    // Get the number of active uniforms in the shader program
+    let uniformCount = gl.getProgramParameter(
+      this._program,
+      gl.ACTIVE_UNIFORMS
+    );
+
+    // Iterate through all active uniforms
+    for (let i = 0; i < uniformCount; i++) {
+      // Get information about the uniform at index i
+      let info = gl.getActiveUniform(this._program, i);
+
+      if (!info) {
+        break;
+      }
+
+      // Store the uniform location in our map for quick lookup
+      // getUniformLocation returns the storage location of the uniform
+      this._uniforms[info.name] = gl.getUniformLocation(
+        this._program,
+        info.name
+      );
     }
   }
 }
