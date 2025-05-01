@@ -1,4 +1,5 @@
 import { gl, GLUtilities } from "./gl/gl";
+import { AttributeInfo, GLBuffer } from "./gl/glBuffer";
 import { Shader } from "./gl/shaders";
 
 /**
@@ -10,19 +11,30 @@ import { Shader } from "./gl/shaders";
  * - Managing shaders
  * - Controlling render pipeline
  * - Handling window resizing
+ *
+ * WebGL References:
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext
  */
 export class KoruTSEngine {
-  /** Tracks frame count for debugging and performance monitoring */
+  /** Counter for tracking frame updates and performance monitoring */
   private _count: number = 0;
 
-  /** Reference to the main canvas element where WebGL renders */
+  /** Canvas element where WebGL context is created and rendering occurs */
   private _canvas!: HTMLCanvasElement;
 
-  /** Basic shader program for rendering */
+  /**
+   * Shader program containing vertex and fragment shaders
+   * Handles transformation and coloring of geometry
+   */
   private _shader!: Shader;
 
-  /** Container for data to be pushed in the graphics card, to be used in the vertex shader */
-  private _buffer!: WebGLBuffer;
+  /**
+   * Vertex Buffer Object (VBO) storing geometry data
+   * Contains vertex positions for rendering
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLBuffer
+   */
+  private _buffer!: GLBuffer;
 
   /**
    * Creates a new engine instance
@@ -32,24 +44,27 @@ export class KoruTSEngine {
 
   /**
    * Initializes and starts the game engine
-   * - Sets up WebGL context
-   * - Configures initial render state
-   * - Loads shader programs
+   * - Sets up WebGL context and canvas
+   * - Configures initial render state and viewport
+   * - Loads and compiles shader programs
+   * - Creates vertex buffers
    * - Begins the render loop
    */
   public start(): void {
     // Initialize WebGL context and get canvas reference
     this._canvas = GLUtilities.initialize();
 
-    // Set default background color to black
+    // Set default background color to black (R=0, G=0, B=0, A=1)
     gl.clearColor(0, 0, 0, 1);
 
-    // Load and activate shader programs
+    // Load and activate shader programs for rendering
     this.loadShaders();
     this._shader.use();
 
+    // Create and initialize vertex buffer with geometry data
     this.createBuffer();
 
+    // Configure initial viewport and canvas size
     this.resize();
 
     // Start the main game loop
@@ -57,27 +72,26 @@ export class KoruTSEngine {
   }
 
   /**
-   * Main game loop
-   * Handles the rendering pipeline for each frame:
-   * 1. Clear previous frame
-   * 2. Bind vertex buffer
-   * 3. Draw geometry
-   * 4. Request next animation frame
+   * Main game loop - Heart of the engine
+   * Executes every frame (typically 60fps) and handles:
+   * 1. Clear previous frame's render
+   * 2. Set up vertex attributes
+   * 3. Bind buffers and configure attributes
+   * 4. Draw geometry
+   * 5. Schedule next frame
    */
   private loop(): void {
     // Clear the color buffer to remove previous frame
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    // Bind our vertex buffer to the GL_ARRAY_BUFFER target
-    gl.bindBuffer(gl.ARRAY_BUFFER, this._buffer);
+    // Set uniforms
+    let colorPosition = this._shader.getUniformLocation("u_color");
 
-    gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
+    gl.uniform4f(colorPosition, 1, 0.5, 0, 1);
 
-    gl.enableVertexAttribArray(0);
+    this._buffer.bind();
 
-    // Draw triangles using the bound buffer
-    // Parameters: primitive type, starting offset, number of vertices
-    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    this._buffer.draw();
 
     // Schedule next frame using requestAnimationFrame
     // bind(this) ensures correct 'this' context in the callback
@@ -90,18 +104,35 @@ export class KoruTSEngine {
    * - Coordinates range from -1 to 1
    * - (0,0) is the center of the screen
    * - Each vertex has X, Y, Z components
+   * - Counter-clockwise winding order for front-facing triangles
    */
   private createBuffer(): void {
-    // Create a new buffer object in GPU memory
-    this._buffer = gl.createBuffer();
+    // Create a new buffer object in GPU memory with 3 components per vertex (x,y,z)
+    this._buffer = new GLBuffer(3);
 
-    // Define vertex data for a triangle
-    // Each vertex is defined by 3 components (x, y, z)
+    // Configure vertex position attribute for the shader
+    let positionAttribute = new AttributeInfo();
+
+    // Get location of a_position attribute from shader program
+    positionAttribute.location =
+      this._shader.getAttributeLocation("a_position");
+
+    // Set offset to 0 (start of vertex data)
+    positionAttribute.offset = 0;
+
+    // Each position has 3 components (x, y, z)
+    positionAttribute.size = 3;
+
+    // Register attribute with buffer for automatic setup during binding
+    this._buffer.addAttributeLocation(positionAttribute);
+
+    // Define triangle vertices in counter-clockwise order
+    // Using normalized device coordinates (-1 to +1)
     let vertices = [
-      // x,   y,   z
+      // x,    y,    z
       0.0,
       0.0,
-      0.0, // Vertex 1: bottom-left
+      0.0, // Vertex 1: bottom-left - Element Buffer
       0.0,
       0.5,
       0.0, // Vertex 2: top-left
@@ -110,21 +141,13 @@ export class KoruTSEngine {
       0.0, // Vertex 3: top-right
     ];
 
-    // Bind the buffer to the GL_ARRAY_BUFFER target
-    gl.bindBuffer(gl.ARRAY_BUFFER, this._buffer);
+    // Upload vertex data to GPU memory
+    this._buffer.pushBackData(vertices);
 
-    gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
+    this._buffer.upload();
 
-    gl.enableVertexAttribArray(0);
-
-    // Upload vertex data to the buffer
-    // Float32Array is used because GLSL expects 32-bit floats
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-
-    // Unbind the buffer to prevent accidental modifications
-    gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
-    gl.disableVertexAttribArray(0);
+    // Unbind buffer to prevent accidental modifications
+    this._buffer.unbind();
   }
 
   /**
@@ -160,8 +183,10 @@ void main() {
     let fragmentShaderSource = `
 precision mediump float;
 
+uniform vec4 u_color;
+
 void main() {
-    gl_FragColor = vec4(1.0);
+    gl_FragColor = u_color;
 }
 `;
 
