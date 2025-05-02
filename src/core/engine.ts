@@ -12,6 +12,7 @@ import { Matrix4x4 } from "./math/matrix4x4";
  * - Handling WebGL context
  * - Resource loading and management
  * - Scene rendering and updates
+ * - Window resizing
  *
  * WebGL References:
  * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API
@@ -63,13 +64,13 @@ export class KoruTSEngine {
     this.loadShaders();
     this._shader.use();
 
-    // Load
+    // Load matrix with params
     this._projection = Matrix4x4.orthographic(
       0,
       this._canvas.width,
       0,
       this._canvas.height,
-      -1.0,
+      -100.0,
       100.0
     );
 
@@ -77,6 +78,7 @@ export class KoruTSEngine {
     this._sprite = new Sprite("test");
     this._sprite.load();
 
+    this._sprite.position.x = 200;
     // Configure initial viewport and canvas size
     this.resize();
 
@@ -109,6 +111,15 @@ export class KoruTSEngine {
       new Float32Array(this._projection.data)
     );
 
+    let modelLocation = this._shader.getUniformLocation("u_model");
+
+    gl.uniformMatrix4fv(
+      // Translate Z
+      modelLocation,
+      false,
+      new Float32Array(Matrix4x4.translation(this._sprite.position).data)
+    );
+
     // Draw Sprite
     this._sprite.draw();
 
@@ -127,7 +138,7 @@ export class KoruTSEngine {
       this._canvas.height = window.innerHeight;
 
       // Normalized Device coordinates - how webGL represents triangles
-      gl.viewport(-1, 1, 1, -1);
+      gl.viewport(-1, 1, -1, 1);
     }
   }
 
@@ -144,8 +155,10 @@ attribute vec3 a_position;
 
 uniform mat4 u_projection;
 
+uniform mat4 u_model;
+
 void main() {
-    gl_Position = u_projection * vec4(a_position, 1.0);
+    gl_Position = u_projection * u_model * vec4(a_position, 1.0);
 }`;
 
     // Basic fragment shader that outputs white color
