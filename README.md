@@ -299,6 +299,23 @@ sprite.load();  // Sets up vertex buffer
 sprite.draw();  // Renders using WebGL
 ```
 
+### [PR:3 Assets & Messages Handling](https://github.com/Cyrus-0101/koru-ts/pull/3)
+1. Asset Loading 
+- Handling the complexities of downloading assets from a web server and the need for a standardized, reusable approach.
+
+2. Asset Manager
+- Responsible for downloading assets and notifying the engine when ready.
+
+3. Messaging System
+- A decoupled communication, creating Message and MessageBus classes.
+- MessageBus manages message subscriptions, posting, and queuing.
+
+4. Image Asset Loader
+- Create an ImageAssetLoader class for loading image assets.
+
+5. Convenience Methods/Refactor
+- Implement convenience methods for sending and subscribing to messages.
+
 ## Next Steps
 
 - [ ] Add texture support
