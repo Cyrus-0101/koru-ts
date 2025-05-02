@@ -68,7 +68,7 @@ export class Shader {
   /**
    * Gets the location of an attribute with the provided name.
    * @param name - The name of the attribute location to retrieve
-   * @returns number -
+   * @returns number OR NULL if not found
    */
   public getAttributeLocation(name: string): number {
     if (this._attributes[name] === undefined) {
