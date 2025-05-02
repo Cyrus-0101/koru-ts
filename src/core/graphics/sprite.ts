@@ -1,12 +1,20 @@
 import { AttributeInfo, GLBuffer } from "../gl/glBuffer";
+import { Vector3 } from "../math/vector3";
 
 /**
  * Sprite class represents a 2D graphical object in the game
  * Handles:
  * - Vertex buffer creation and management
  * - Attribute configuration
- * - Drawing operations
+ * - Draw call handling
  * - Size and position management
+ *
+ * Memory Layout:
+ * Each vertex contains:
+ * - Position (vec3: x, y, z)
+ * Future:
+ * - Texture coordinates (vec2: u, v)
+ * - Color (vec4: r, g, b, a)
  */
 export class Sprite {
   /** Unique identifier for this sprite */
@@ -24,6 +32,9 @@ export class Sprite {
    * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLBuffer
    */
   private _buffer!: GLBuffer;
+
+  /** Position in world space */
+  public position: Vector3 = new Vector3();
 
   /**
    * Creates a new sprite instance
