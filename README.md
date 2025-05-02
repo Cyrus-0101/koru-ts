@@ -82,6 +82,39 @@ const shader = new Shader("basic", vertexShaderSource, fragmentShaderSource);
 shader.use(); // Activate shader for rendering
 ```
 
+#### [`Matrix4x4`](src/core/math/matrix4x4.ts)
+
+Handles 4x4 matrix operations for 3D transformations and projections.
+
+**Responsibilities:**
+- Creates and manages 4x4 transformation matrices
+- Provides orthographic projection matrix generation
+- Handles column-major matrix operations
+- Supports WebGL-compatible array format
+
+**Matrix Structure**
+```typescript
+// Column-Major Order:
+[
+    2/(r-l),    0,         0,        -(r+l)/(r-l),
+    0,       2/(t-b),      0,        -(t+b)/(t-b),
+    0,          0,     2/(n-f),      -(f+n)/(n-f),
+    0,          0,         0,             1
+]
+```
+**Example:**
+```typescript
+// Create orthographic projection for 1920x1080 screen
+const projection = Matrix4x4.orthographic(
+    0,           // left
+    1920,        // right
+    0,           // bottom
+    1080,        // top
+    -1,          // near clip
+    100          // far clip
+);
+```
+
 ### Current Features
 
 1. **WebGL Context Management**
@@ -147,17 +180,18 @@ void main() {
 ```
 src/
 ├── core/
-│   ├── engine.ts       # Main engine class, game loop, and rendering setup
+│   ├── engine.ts          # Main engine class, game loop, and rendering setup
+│   ├── math/
+│   │   └── matrix4x4.ts   # Matrix operations and transformations
 │   └── gl/
-│       ├── gl.ts       # WebGL context and canvas initialization
-│       ├── glBuffer.ts # Buffer management (VBO, attributes)
-│       └── shaders.ts  # GLSL shader compilation and management
-├── shaders/           # GLSL shader source files
-│   ├── basic.vert.ts  # Basic vertex shader
-│   └── basic.frag.ts  # Basic fragment shader
-├── index.html        # Main HTML entry point
-├── app.ts           # Application initialization
-└── tsconfig.json    # TypeScript configuration
+│       ├── gl.ts          # WebGL context and canvas initialization
+│       ├── glBuffer.ts    # Buffer management (VBO, attributes)
+│       └── shaders.ts     # GLSL shader compilation and management
+├── graphics/
+│   └── sprite.ts          # 2D sprite rendering and management
+├── index.html             # Main HTML entry point
+├── app.ts                 # Application initialization
+└── tsconfig.json          # TypeScript configuration
 ```
 
 ## Getting Started
