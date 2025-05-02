@@ -266,6 +266,39 @@ private createBuffer(): void {
 }
 ```
 
+### [PR: Sprite Rendering System Implementation](https://github.com/Cyrus-0101/koru-ts/pull/2)
+This PR establishes the foundation for 2D rendering in the KoruTS engine. Core Changes:
+1. Matrix4x4 Class
+- Implemented orthographic projection matrix
+- Added column-major matrix operations
+- Documentation for matrix transformations
+
+2. GLBuffer Improvements
+- Added vertex buffer management
+- Implemented attribute handling
+- Added support for different data types
+- Enhanced buffer binding operations
+
+3. Sprite System
+- Added basic Sprite class
+- Implemented vertex buffer creation for sprites
+- Added size and position management
+- Set up draw operations
+
+4. Engine Updates
+- Integrated sprite rendering pipeline
+- Added projection matrix support
+- Implemented viewport management
+- Added window resize handling
+
+**Example**
+Sprite creation and rendering:
+```typescript
+const sprite = new Sprite("test", 100, 100);
+sprite.load();  // Sets up vertex buffer
+sprite.draw();  // Renders using WebGL
+```
+
 ## Next Steps
 
 - [ ] Add texture support
