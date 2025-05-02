@@ -115,6 +115,45 @@ const projection = Matrix4x4.orthographic(
 );
 ```
 
+#### [`Vector3`](src/core/math/vector3.ts)
+
+Represents a 3D vector with x, y, z components for spatial operations.
+
+**Responsibilities:**
+- Stores 3D coordinates and directions
+- Provides vector math operations
+- Supports position and scaling operations
+- Converts to WebGL-compatible formats
+
+**Vector Components:**
+```typescript
+class Vector3 {
+    private _x: number;  // X component
+    private _y: number;  // Y component
+    private _z: number;  // Z component
+}
+```
+
+**Common Uses:**
+- Object positions
+- Movement directions
+- Scale factors
+- Force vectors
+- Normal vectors
+
+**Example:**
+```typescript
+// Create a position vector
+const position = new Vector3(100, 200, 0);
+
+// Access components
+position.x = 150;  // Move right
+position.y += 10;  // Move up
+
+// Convert to array for WebGL
+const vertexData = position.toFloat32Array();
+```
+
 ### Current Features
 
 1. **WebGL Context Management**
