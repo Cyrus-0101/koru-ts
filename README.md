@@ -266,7 +266,7 @@ private createBuffer(): void {
 }
 ```
 
-### [PR: Sprite Rendering System Implementation](https://github.com/Cyrus-0101/koru-ts/pull/2)
+### [PR:2 Sprite Rendering System Implementation](https://github.com/Cyrus-0101/koru-ts/pull/2)
 This PR establishes the foundation for 2D rendering in the KoruTS engine. Core Changes:
 1. Matrix4x4 Class
 - Implemented orthographic projection matrix
