@@ -1,3 +1,5 @@
+import type { Vector3 } from "./vector3";
+
 /**
  * Matrix4x4 - Handles 4x4 matrix operations for 3D transformations
  *
@@ -128,7 +130,46 @@ export class Matrix4x4 {
     m._data[13] = (top + bottom) * bt;
 
     // Translate Z
-    m._data[14] = (farClip + nearClip) * nf; // Translate Z
+    m._data[14] = (farClip + nearClip) * nf;
+
+    return m;
+  }
+
+  /**
+   * Creates a translation matrix from a Vector3 position
+   *
+   * Translation Matrix Structure:
+   * [
+   *   1, 0, 0, x,  // x = position.x
+   *   0, 1, 0, y,  // y = position.y
+   *   0, 0, 1, z,  // z = position.z
+   *   0, 0, 0, 1
+   * ]
+   *
+   * Used for:
+   * - Moving objects in 3D space
+   * - Positioning sprites
+   * - Offsetting geometry
+   *
+   * Note: In column-major order, translation values are stored in:
+   * - m._data[12] for X translation
+   * - m._data[13] for Y translation
+   * - m._data[14] for Z translation
+   *
+   * @param position Vector3 containing the translation values
+   * @returns New Matrix4x4 configured for translation
+   */
+  public static translation(position: Vector3): Matrix4x4 {
+    let m = new Matrix4x4();
+
+    // X translation
+    m._data[12] = position.x;
+
+    // Y translation
+    m._data[13] = position.y;
+
+    // Z translation
+    m._data[14] = position.z;
 
     return m;
   }
