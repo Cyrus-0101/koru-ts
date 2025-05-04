@@ -115,6 +115,90 @@ const projection = Matrix4x4.orthographic(
 );
 ```
 
+#### [`Vector3`](src/core/math/vector3.ts)
+
+Represents a 3D vector with x, y, z components for spatial operations.
+
+**Responsibilities:**
+- Stores 3D coordinates and directions
+- Provides vector math operations
+- Supports position and scaling operations
+- Converts to WebGL-compatible formats
+
+**Vector Components:**
+```typescript
+class Vector3 {
+    private _x: number;  // X component
+    private _y: number;  // Y component
+    private _z: number;  // Z component
+}
+```
+
+**Common Uses:**
+- Object positions
+- Movement directions
+- Scale factors
+- Force vectors
+- Normal vectors
+
+**Example:**
+```typescript
+// Create a position vector
+const position = new Vector3(100, 200, 0);
+
+// Access components
+position.x = 150;  // Move right
+position.y += 10;  // Move up
+
+// Convert to array for WebGL
+const vertexData = position.toFloat32Array();
+```
+
+#### [`MessageBus`](src/core/message/messageBus.ts)
+
+Central message distribution system implementing the Publisher/Subscriber pattern.
+
+**Responsibilities:**
+- Message distribution and queuing
+- Priority-based message processing
+- Handler subscription management
+- Decoupled component communication
+
+**Example:**
+```typescript
+// Subscribe to messages
+MessageBus.addSubscription("COLLISION", this);
+
+// Post a message
+MessageBus.post(new Message("COLLISION", this, { damage: 50 }));
+
+// Process queued messages
+MessageBus.update(gameTime);
+```
+
+
+#### [`AssetManager`](src/core/assets/assetManager.ts)
+
+Central message distribution system implementing the Publisher/Subscriber pattern.
+
+**Responsibilities:**
+- Asset loading and caching
+- Loader type resolution
+- Resource lifecycle management
+- Loading state tracking
+
+**Example:**
+```typescript
+// Register a custom loader
+AssetManager.registerLoader(new TextureLoader());
+
+// Load an asset
+AssetManager.loadAsset("player.png");
+
+// Get a loaded asset
+const texture = AssetManager.getAsset("player.png");
+```
+
 ### Current Features
 
 1. **WebGL Context Management**
@@ -265,6 +349,61 @@ private createBuffer(): void {
     ];
 }
 ```
+
+### [PR:2 Sprite Rendering System Implementation](https://github.com/Cyrus-0101/koru-ts/pull/2)
+This PR establishes the foundation for 2D rendering in the KoruTS engine. Core Changes:
+1. Matrix4x4 Class
+- Implemented orthographic projection matrix
+- Added column-major matrix operations
+- Documentation for matrix transformations
+
+2. GLBuffer Improvements
+- Added vertex buffer management
+- Implemented attribute handling
+- Added support for different data types
+- Enhanced buffer binding operations
+
+3. Sprite System
+- Added basic Sprite class
+- Implemented vertex buffer creation for sprites
+- Added size and position management
+- Set up draw operations
+
+4. Engine Updates
+- Integrated sprite rendering pipeline
+- Added projection matrix support
+- Implemented viewport management
+- Added window resize handling
+
+**Example**
+Sprite creation and rendering:
+```typescript
+const sprite = new Sprite("test", 100, 100);
+sprite.load();  // Sets up vertex buffer
+sprite.draw();  // Renders using WebGL
+```
+
+### [PR:3 Assets & Messages Handling](https://github.com/Cyrus-0101/koru-ts/pull/3)
+The PR establishes a robust foundation for asset management and component communication in the engine.
+1. Asset Management System
+- Implemented `AssetManager` singleton for centralized resource management
+- Added asset loading pipeline with support for different asset types
+- Created `IAsset` and `IAssetLoader` interfaces
+- Implemented image asset loading with 
+`ImageAssetLoader`
+- Added asset caching and state management
+
+2. Messaging System
+- Added `MessageBus` for decoupled component communication
+- Implemented priority-based message processing
+- Created message subscription and handling system
+- Added support for HIGH and NORMAL priority messages
+- Implemented message queuing for NORMAL priority
+
+3. Integration
+- Connected asset loading with message system for load notifications
+- Added asset load completion messaging
+- Implemented message-based asset state updates
 
 ## Next Steps
 
