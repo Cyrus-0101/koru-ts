@@ -259,6 +259,28 @@ void main() {
 }
 ```
 
+### v2 Shader Implementation
+```glsl
+// Added projection and model calculations to the vertex shader
+attribute vec3 a_position;
+
+uniform mat4 u_projection;
+uniform mat4 u_model;
+
+void main() {
+    gl_Position = u_projection * u_model * vec4(a_position, 1.0);
+};
+
+// Basic fragment shader
+precision mediump float;
+
+uniform vec4 u_color;
+
+void main() {
+    gl_FragColor = u_color;
+};
+```
+
 ### File Structure
 
 ```
@@ -277,12 +299,16 @@ src/
 │   ├── engine.ts                         # Main engine class, game loop, and rendering setup
 │   ├── math/
 │   │   └── matrix4x4.ts                  # Matrix operations and transformations
+│   │   └── vector3.ts                    # 3D vector operations
 │   └── gl/
 │       ├── gl.ts                         # WebGL context and canvas initialization
 │       ├── glBuffer.ts                   # Buffer management (VBO, attributes)
 │       └── shaders.ts                    # GLSL shader compilation and management
 ├── graphics/
 │   └── sprite.ts                         # 2D sprite rendering and management
+├── shaders/                              # GLSL shader source files
+│   ├── basic.vert.ts                     # Basic vertex shader
+│   └── basic.frag.ts                     # Basic fragment shader
 ├── index.html                            # Main HTML entry point
 ├── app.ts                                # Application initialization
 └── tsconfig.json                         # TypeScript configuration
