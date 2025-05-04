@@ -3,6 +3,8 @@ import { AttributeInfo, GLBuffer } from "./gl/glBuffer";
 import { Shader } from "./gl/shaders";
 import { Sprite } from "./graphics/sprite";
 import { Matrix4x4 } from "./math/matrix4x4";
+import { fragmentShaderSource } from "./shaders/basic.frag";
+import { vertexShaderSource } from "./shaders/basic.vert";
 
 /**
  * KoruTSEngine - Core Game Engine Class
@@ -149,29 +151,6 @@ export class KoruTSEngine {
    * - Fragment shader: Sets pixel colors
    */
   private loadShaders(): void {
-    // Basic vertex shader that transforms positions
-    let vertexShaderSource = `
-attribute vec3 a_position;
-
-uniform mat4 u_projection;
-
-uniform mat4 u_model;
-
-void main() {
-    gl_Position = u_projection * u_model * vec4(a_position, 1.0);
-}`;
-
-    // Basic fragment shader that outputs white color
-    let fragmentShaderSource = `
-precision mediump float;
-
-uniform vec4 u_color;
-
-void main() {
-    gl_FragColor = u_color;
-}
-`;
-
     // Create new shader program with both shaders
     this._shader = new Shader(
       "basic",
