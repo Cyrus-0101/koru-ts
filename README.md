@@ -384,6 +384,7 @@ sprite.draw();  // Renders using WebGL
 ```
 
 ### [PR:3 Assets & Messages Handling](https://github.com/Cyrus-0101/koru-ts/pull/3)
+The PR establishes a robust foundation for asset management and component communication in the engine.
 1. Asset Management System
 - Implemented `AssetManager` singleton for centralized resource management
 - Added asset loading pipeline with support for different asset types
