@@ -179,7 +179,7 @@ MessageBus.update(gameTime);
 
 #### [`AssetManager`](src/core/assets/assetManager.ts)
 
-Central message distribution system implementing the Publisher/Subscriber pattern.
+Singleton system for managing game assets and resource loading.
 
 **Responsibilities:**
 - Asset loading and caching
@@ -264,18 +264,28 @@ void main() {
 ```
 src/
 ├── core/
-│   ├── engine.ts          # Main engine class, game loop, and rendering setup
+│   ├── assets/
+│   │   ├── assetManager.ts               # Central asset management system
+│   │   ├── IAsset.ts                     # Asset interface definition
+│   │   ├── IAssetLoader.ts               # Asset loader interface
+│   │   └── imageAssetLoader.ts           # Image loading implementation
+│   ├── message/
+│   │   ├── messageBus.ts                 # Central message distribution
+│   │   ├── message.ts                    # Message class definition
+│   │   ├── IMessageHandler.ts            # Message handler interface
+│   │   └── messageSubscriptionNode.ts    # Message queue node
+│   ├── engine.ts                         # Main engine class, game loop, and rendering setup
 │   ├── math/
-│   │   └── matrix4x4.ts   # Matrix operations and transformations
+│   │   └── matrix4x4.ts                  # Matrix operations and transformations
 │   └── gl/
-│       ├── gl.ts          # WebGL context and canvas initialization
-│       ├── glBuffer.ts    # Buffer management (VBO, attributes)
-│       └── shaders.ts     # GLSL shader compilation and management
+│       ├── gl.ts                         # WebGL context and canvas initialization
+│       ├── glBuffer.ts                   # Buffer management (VBO, attributes)
+│       └── shaders.ts                    # GLSL shader compilation and management
 ├── graphics/
-│   └── sprite.ts          # 2D sprite rendering and management
-├── index.html             # Main HTML entry point
-├── app.ts                 # Application initialization
-└── tsconfig.json          # TypeScript configuration
+│   └── sprite.ts                         # 2D sprite rendering and management
+├── index.html                            # Main HTML entry point
+├── app.ts                                # Application initialization
+└── tsconfig.json                         # TypeScript configuration
 ```
 
 ## Getting Started
