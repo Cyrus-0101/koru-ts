@@ -154,6 +154,51 @@ position.y += 10;  // Move up
 const vertexData = position.toFloat32Array();
 ```
 
+#### [`MessageBus`](src/core/message/messageBus.ts)
+
+Central message distribution system implementing the Publisher/Subscriber pattern.
+
+**Responsibilities:**
+- Message distribution and queuing
+- Priority-based message processing
+- Handler subscription management
+- Decoupled component communication
+
+**Example:**
+```typescript
+// Subscribe to messages
+MessageBus.addSubscription("COLLISION", this);
+
+// Post a message
+MessageBus.post(new Message("COLLISION", this, { damage: 50 }));
+
+// Process queued messages
+MessageBus.update(gameTime);
+```
+
+
+#### [`AssetManager`](src/core/assets/assetManager.ts)
+
+Central message distribution system implementing the Publisher/Subscriber pattern.
+
+**Responsibilities:**
+- Asset loading and caching
+- Loader type resolution
+- Resource lifecycle management
+- Loading state tracking
+
+**Example:**
+```typescript
+// Register a custom loader
+AssetManager.registerLoader(new TextureLoader());
+
+// Load an asset
+AssetManager.loadAsset("player.png");
+
+// Get a loaded asset
+const texture = AssetManager.getAsset("player.png");
+```
+
 ### Current Features
 
 1. **WebGL Context Management**
@@ -339,21 +384,25 @@ sprite.draw();  // Renders using WebGL
 ```
 
 ### [PR:3 Assets & Messages Handling](https://github.com/Cyrus-0101/koru-ts/pull/3)
-1. Asset Loading 
-- Handling the complexities of downloading assets from a web server and the need for a standardized, reusable approach.
+1. Asset Management System
+- Implemented `AssetManager` singleton for centralized resource management
+- Added asset loading pipeline with support for different asset types
+- Created `IAsset` and `IAssetLoader` interfaces
+- Implemented image asset loading with 
+`ImageAssetLoader`
+- Added asset caching and state management
 
-2. Asset Manager
-- Responsible for downloading assets and notifying the engine when ready.
+2. Messaging System
+- Added `MessageBus` for decoupled component communication
+- Implemented priority-based message processing
+- Created message subscription and handling system
+- Added support for HIGH and NORMAL priority messages
+- Implemented message queuing for NORMAL priority
 
-3. Messaging System
-- A decoupled communication, creating Message and MessageBus classes.
-- MessageBus manages message subscriptions, posting, and queuing.
-
-4. Image Asset Loader
-- Create an ImageAssetLoader class for loading image assets.
-
-5. Convenience Methods/Refactor
-- Implement convenience methods for sending and subscribing to messages.
+3. Integration
+- Connected asset loading with message system for load notifications
+- Added asset load completion messaging
+- Implemented message-based asset state updates
 
 ## Next Steps
 
