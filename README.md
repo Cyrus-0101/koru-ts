@@ -176,7 +176,6 @@ MessageBus.post(new Message("COLLISION", this, { damage: 50 }));
 MessageBus.update(gameTime);
 ```
 
-
 #### [`AssetManager`](src/core/assets/assetManager.ts)
 
 Singleton system for managing game assets and resource loading.
@@ -199,32 +198,80 @@ AssetManager.loadAsset("player.png");
 const texture = AssetManager.getAsset("player.png");
 ```
 
+#### [`Texture`](src/core/graphics/texture.ts)
+
+Handles WebGL texture loading and management.
+
+**Responsibilities:**
+- Asynchronous texture loading
+- WebGL texture lifecycle management
+- Texture unit binding
+- Mipmap generation
+- Placeholder texture during load
+
+**Example:**
+```typescript
+// Create and load a texture
+const texture = new Texture("player.png");
+
+// Bind for rendering
+texture.activateAndBind(0);  // Use texture unit 0
+```
+
+#### [`TextureManager`](src/core/graphics/textureManager.ts)
+
+Singleton system for texture resource management.
+
+**Responsibilities:**
+- Reference counting for textures
+- Automatic resource cleanup
+- Texture caching
+- Memory optimization
+
+
+**Example:**
+```typescript
+// Get or create a texture (increments reference count)
+const texture = TextureManager.getTexture("player.png");
+
+// Release when done (decrements reference count)
+TextureManager.releaseTexture("player.png");
+```
+
 ### Current Features
+1. **Rendering System**
+- WebGL context management
+- GLSL shader compilation and linking
+- Vertex buffer management
+- Texture loading and binding
+- Sprite rendering with textures
 
-1. **WebGL Context Management**
+2. **Resource Management**
+- Reference-counted textures
+- Asynchronous asset loading
+- Automatic resource cleanup
+- Texture caching
+- Memory optimization
 
-   - Automatic canvas creation
-   - WebGL context initialization
-   - Error handling for unsupported browsers
+3. **Mathematics**
+- Matrix4x4 transformations
+- Vector2/3 operations
+- Orthographic projection
+- UV coordinate mapping
 
-2. **Shader System**
+4. **Core Architecture**
+- Component messaging system
+- Asset management pipeline
+- Game loop optimization
+- Window management
+- Event handling
 
-   - GLSL shader compilation
-   - Program linking
-   - Basic vertex and fragment shaders
-   - Attribute handling
-
-3. **Rendering Pipeline**
-
-   - Vertex buffer creation
-   - Attribute pointer configuration
-   - Basic triangle rendering
-   - Frame clearing and buffer management
-
-4. **Window Management**
-   - Responsive canvas sizing
-   - Window resize handling
-   - Fullscreen support
+5. **Graphics Features**
+- Texture unit management
+- Mipmap generation
+- UV coordinate support
+- Sprite transformations
+- Attribute handling
 
 ## Technical Implementation
 
