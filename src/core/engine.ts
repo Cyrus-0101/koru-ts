@@ -1,8 +1,10 @@
+import { AssetManager } from "./assets/assetManager";
 import { gl, GLUtilities } from "./gl/gl";
 import { AttributeInfo, GLBuffer } from "./gl/glBuffer";
 import { Shader } from "./gl/shaders";
 import { Sprite } from "./graphics/sprite";
 import { Matrix4x4 } from "./math/matrix4x4";
+import { MessageBus } from "./message/messageBus";
 import { fragmentShaderSource } from "./shaders/basic.frag";
 import { vertexShaderSource } from "./shaders/basic.vert";
 
@@ -15,6 +17,12 @@ import { vertexShaderSource } from "./shaders/basic.vert";
  * - Resource loading and management
  * - Scene rendering and updates
  * - Window resizing
+ *
+ * Architecture:
+ * - Uses WebGL for hardware-accelerated rendering
+ * - Implements a basic sprite rendering system
+ * - Handles projection and model transformations
+ * - Manages shader programs and uniforms
  *
  * WebGL References:
  * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API
@@ -59,6 +67,8 @@ export class KoruTSEngine {
     // Initialize WebGL context and get canvas reference
     this._canvas = GLUtilities.initialize();
 
+    AssetManager.initiliaze();
+
     // Set default background color to black (R=0, G=0, B=0, A=1)
     gl.clearColor(0, 0, 0, 1);
 
@@ -77,7 +87,7 @@ export class KoruTSEngine {
     );
 
     // Create and load test sprite
-    this._sprite = new Sprite("test");
+    this._sprite = new Sprite("test", "assets/textures/crate.jpg");
     this._sprite.load();
 
     this._sprite.position.x = 200;
@@ -97,13 +107,17 @@ export class KoruTSEngine {
    * 4. Schedule next frame
    */
   private loop(): void {
+    // MessageBus updating
+    MessageBus.update(0);
+
     // Clear the color buffer to remove previous frame
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     // Set uniforms
-    let colorPosition = this._shader.getUniformLocation("u_color");
+    let colorPosition = this._shader.getUniformLocation("u_tint");
 
     gl.uniform4f(colorPosition, 1, 0.5, 0, 1); // Orange color
+    // gl.uniform4f(colorPosition, 1, 1, 1, 1);
 
     let projectionPosition = this._shader.getUniformLocation("u_projection");
 
@@ -123,7 +137,7 @@ export class KoruTSEngine {
     );
 
     // Draw Sprite
-    this._sprite.draw();
+    this._sprite.draw(this._shader);
 
     // Schedule next frame using requestAnimationFrame
     // bind(this) ensures correct 'this' context in the callback
@@ -140,7 +154,7 @@ export class KoruTSEngine {
       this._canvas.height = window.innerHeight;
 
       // Normalized Device coordinates - how webGL represents triangles
-      gl.viewport(-1, 1, -1, 1);
+      // gl.viewport(-1, 1, -1, 1);
     }
   }
 

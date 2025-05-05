@@ -1,5 +1,9 @@
+import { gl } from "../gl/gl";
 import { AttributeInfo, GLBuffer } from "../gl/glBuffer";
+import type { Shader } from "../gl/shaders";
 import { Vector3 } from "../math/vector3";
+import { Texture } from "./texture";
+import { TextureManager } from "./textureManager";
 
 /**
  * Sprite class represents a 2D graphical object in the game
@@ -8,13 +12,17 @@ import { Vector3 } from "../math/vector3";
  * - Attribute configuration
  * - Draw call handling
  * - Size and position management
+ * - Texture management
  *
  * Memory Layout:
  * Each vertex contains:
  * - Position (vec3: x, y, z)
+ *
  * Future:
  * - Texture coordinates (vec2: u, v)
  * - Color (vec4: r, g, b, a)
+ * - Rotation support
+ * - Scale transformations
  */
 export class Sprite {
   /** Unique identifier for this sprite */
@@ -36,16 +44,31 @@ export class Sprite {
   /** Position in world space */
   public position: Vector3 = new Vector3();
 
+  /** Texture instance for this sprite */
+  private _texture: Texture;
+
+  /** Name/path of the texture resource */
+  private _textureName: string;
+
   /**
    * Creates a new sprite instance
    * @param name Unique identifier for this sprite
-   * @param width Width in pixels/units (default: 10)
-   * @param height Height in pixels/units (default: 10)
+   * @param textureName The name of the texture to use with the sprite
+   * @param width Width in pixels/units (default: 100)
+   * @param height Height in pixels/units (default: 100)
    */
-  public constructor(name: string, width: number = 100, height: number = 100) {
+  public constructor(
+    name: string,
+    textureName: string,
+    width: number = 100,
+    height: number = 100
+  ) {
     this._name = name;
     this._width = width;
     this._height = height;
+
+    this._textureName = textureName;
+    this._texture = TextureManager.getTexture(this._textureName);
   }
 
   /**
@@ -56,7 +79,7 @@ export class Sprite {
    */
   public load(): void {
     // Create a new buffer object in GPU memory with 3 components per vertex (x,y,z)
-    this._buffer = new GLBuffer(3);
+    this._buffer = new GLBuffer(5);
 
     // Configure vertex position attribute for the shader
     let positionAttribute = new AttributeInfo();
@@ -73,30 +96,54 @@ export class Sprite {
     // Register attribute with buffer for automatic setup during binding
     this._buffer.addAttributeLocation(positionAttribute);
 
+    let texCoordAttributes = new AttributeInfo();
+
+    texCoordAttributes.location = 1;
+
+    texCoordAttributes.offset = 3;
+
+    // Each position has 3 components (U, V or x, y)
+    texCoordAttributes.size = 2;
+
+    // Register attribute with buffer for automatic setup during binding
+    this._buffer.addAttributeLocation(texCoordAttributes);
+
     // Define quad vertices using two triangles
     // Counter-clockwise winding order for proper face culling
     let vertices = [
-      // First triangle (bottom-left, top-left, top-right)
+      // First triangle (bottom-left, top-left, top-right - x,y,z)  (U, V)
       0.0,
       0.0,
       0.0, // Vertex 1: bottom-left
       0.0,
+      0.0,
+      0.0,
       this._height,
       0.0, // Vertex 2: top-left
+      0.0,
+      1.0,
       this._width,
       this._height,
       0.0, // Vertex 3: top-right
+      1.0,
+      1.0,
 
       // Second triangle (top-right, bottom-right, bottom-left)
       this._width,
       this._height,
       0.0, // Vertex 4: top-right
+      1.0,
+      1.0,
       this._width,
       0.0,
       0.0, // Vertex 5: bottom-right
+      1.0,
+      0.0,
       0.0,
       0.0,
       0.0, // Vertex 6: bottom-left
+      0.0,
+      0.0,
     ];
 
     // Upload vertex data to GPU memory
@@ -109,17 +156,57 @@ export class Sprite {
   }
 
   /**
-   * Updates sprite state
+   * Gets the sprite's unique identifier
+   * @returns The sprite's name
+   */
+  public get name(): string {
+    return this._name;
+  }
+
+  /**
+   * Cleans up sprite resources
+   * - Destroys vertex buffer
+   * - Releases texture reference
+   *
+   * Should be called when sprite is no longer needed
+   */
+  public destroy(): void {
+    this._buffer.destroy();
+    TextureManager.releaseTexture(this._textureName);
+  }
+
+  /**
+   * Updates routines on sprite state
+   * Called each frame by the game engine
+   *
    * @param time Current game time in milliseconds
+   *
+   * TODO: Add animation and movement updates
    */
   public update(time: number): void {}
 
   /**
    * Renders the sprite using its vertex buffer
+   *
+   * Process:
+   * 1. Activates and binds texture
+   * 2. Binds vertex buffer
+   * 3. Sets up attributes
+   * 4. Issues draw call
+   *
+   * @param shader Shader program to use for rendering
    */
-  public draw(): void {
+  public draw(shader: Shader): void {
+    // Activate and bind texture for this sprite
+    this._texture.activateAndBind(0);
+
+    let diffuseLocation = shader.getUniformLocation("u_diffuse");
+
+    gl.uniform1i(diffuseLocation, 0);
+
     // Bind buffer
     this._buffer.bind();
+
     // Draw quad
     this._buffer.draw();
   }

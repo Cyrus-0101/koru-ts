@@ -176,7 +176,6 @@ MessageBus.post(new Message("COLLISION", this, { damage: 50 }));
 MessageBus.update(gameTime);
 ```
 
-
 #### [`AssetManager`](src/core/assets/assetManager.ts)
 
 Singleton system for managing game assets and resource loading.
@@ -199,32 +198,80 @@ AssetManager.loadAsset("player.png");
 const texture = AssetManager.getAsset("player.png");
 ```
 
+#### [`Texture`](src/core/graphics/texture.ts)
+
+Handles WebGL texture loading and management.
+
+**Responsibilities:**
+- Asynchronous texture loading
+- WebGL texture lifecycle management
+- Texture unit binding
+- Mipmap generation
+- Placeholder texture during load
+
+**Example:**
+```typescript
+// Create and load a texture
+const texture = new Texture("player.png");
+
+// Bind for rendering
+texture.activateAndBind(0);  // Use texture unit 0
+```
+
+#### [`TextureManager`](src/core/graphics/textureManager.ts)
+
+Singleton system for texture resource management.
+
+**Responsibilities:**
+- Reference counting for textures
+- Automatic resource cleanup
+- Texture caching
+- Memory optimization
+
+
+**Example:**
+```typescript
+// Get or create a texture (increments reference count)
+const texture = TextureManager.getTexture("player.png");
+
+// Release when done (decrements reference count)
+TextureManager.releaseTexture("player.png");
+```
+
 ### Current Features
+1. **Rendering System**
+- WebGL context management
+- GLSL shader compilation and linking
+- Vertex buffer management
+- Texture loading and binding
+- Sprite rendering with textures
 
-1. **WebGL Context Management**
+2. **Resource Management**
+- Reference-counted textures
+- Asynchronous asset loading
+- Automatic resource cleanup
+- Texture caching
+- Memory optimization
 
-   - Automatic canvas creation
-   - WebGL context initialization
-   - Error handling for unsupported browsers
+3. **Mathematics**
+- Matrix4x4 transformations
+- Vector2/3 operations
+- Orthographic projection
+- UV coordinate mapping
 
-2. **Shader System**
+4. **Core Architecture**
+- Component messaging system
+- Asset management pipeline
+- Game loop optimization
+- Window management
+- Event handling
 
-   - GLSL shader compilation
-   - Program linking
-   - Basic vertex and fragment shaders
-   - Attribute handling
-
-3. **Rendering Pipeline**
-
-   - Vertex buffer creation
-   - Attribute pointer configuration
-   - Basic triangle rendering
-   - Frame clearing and buffer management
-
-4. **Window Management**
-   - Responsive canvas sizing
-   - Window resize handling
-   - Fullscreen support
+5. **Graphics Features**
+- Texture unit management
+- Mipmap generation
+- UV coordinate support
+- Sprite transformations
+- Attribute handling
 
 ## Technical Implementation
 
@@ -287,31 +334,34 @@ void main() {
 src/
 ├── core/
 │   ├── assets/
-│   │   ├── assetManager.ts               # Central asset management system
-│   │   ├── IAsset.ts                     # Asset interface definition
-│   │   ├── IAssetLoader.ts               # Asset loader interface
-│   │   └── imageAssetLoader.ts           # Image loading implementation
+│   │   ├── assetManager.ts                 # Asset loading and management
+│   │   ├── IAsset.ts                       # Asset interface definition
+│   │   ├── IAssetLoader.ts                 # Asset loader interface
+│   │   └── imageAssetLoader.ts             # Image loading implementation
+│   ├── graphics/
+│   │   ├── texture.ts                      # WebGL texture management
+│   │   ├── textureManager.ts               # Texture reference counting
+│   │   └── sprite.ts                       # 2D sprite rendering
 │   ├── message/
-│   │   ├── messageBus.ts                 # Central message distribution
-│   │   ├── message.ts                    # Message class definition
-│   │   ├── IMessageHandler.ts            # Message handler interface
-│   │   └── messageSubscriptionNode.ts    # Message queue node
-│   ├── engine.ts                         # Main engine class, game loop, and rendering setup
+│   │   ├── messageBus.ts                   # Message distribution system
+│   │   ├── message.ts                      # Message class definition
+│   │   ├── IMessageHandler.ts              # Message handler interface
+│   │   └── messageSubscriptionNode.ts      # Message queue node
 │   ├── math/
-│   │   └── matrix4x4.ts                  # Matrix operations and transformations
-│   │   └── vector3.ts                    # 3D vector operations
-│   └── gl/
-│       ├── gl.ts                         # WebGL context and canvas initialization
-│       ├── glBuffer.ts                   # Buffer management (VBO, attributes)
-│       └── shaders.ts                    # GLSL shader compilation and management
-├── graphics/
-│   └── sprite.ts                         # 2D sprite rendering and management
-├── shaders/                              # GLSL shader source files
-│   ├── basic.vert.ts                     # Basic vertex shader
-│   └── basic.frag.ts                     # Basic fragment shader
-├── index.html                            # Main HTML entry point
-├── app.ts                                # Application initialization
-└── tsconfig.json                         # TypeScript configuration
+│   │   ├── matrix4x4.ts                    # Matrix transformations
+│   │   ├── vector2.ts                      # 2D vector operations
+│   │   └── vector3.ts                      # 3D vector operations
+│   ├── gl/
+│   │   ├── gl.ts                           # WebGL context management
+│   │   ├── glBuffer.ts                     # Buffer operations
+│   │   └── shaders.ts                      # Shader compilation
+│   └── engine.ts                           # Main engine class
+├── shaders/
+│   ├── basic.vert.ts                       # Basic vertex shader
+│   └── basic.frag.ts                       # Basic fragment shader
+├── index.html                              # Entry point
+├── app.ts                                  # Application setup
+└── tsconfig.json                           # TypeScript config
 ```
 
 ## Getting Started
@@ -328,17 +378,61 @@ bun install
 bun run build
 ```
 
-3. Open `index.html` in a browser to see a white triangle rendered on a black background.
+3. Open `index.html` in a browser.
 
 ## Current Status
 
 The engine currently demonstrates:
 
-- Basic WebGL setup and initialization
-- Shader compilation and management
-- Simple geometry rendering (triangle)
-- Game loop implementation
-- Basic window management
+### Core Systems
+- WebGL context management and initialization
+- Game loop with requestAnimationFrame
+- Window/canvas management with resize handling
+- Asset loading system with async support
+- Message-based component communication
+
+### Graphics Pipeline
+- GLSL shader compilation and management
+- Vertex buffer creation and attribute handling
+- 2D sprite rendering with textures
+- Basic transformation support
+- Reference-counted texture management
+
+### Mathematics
+- 4x4 matrix operations for transformations
+- 2D/3D vector operations
+- Orthographic projection support
+- Basic geometry calculations
+
+### Example Usage:
+```typescript
+// Initialize engine
+const engine = new KoruTSEngine();
+
+// Create and load a textured sprite
+const sprite = new Sprite("player", "assets/player.png");
+sprite.load();
+
+// Position sprite
+sprite.position.x = 100;
+sprite.position.y = 200;
+
+// Start the engine
+engine.start();
+```
+
+### Latest Features
+1. ✅ Texture loading and management
+2. ✅ Sprite rendering system
+3. ✅ Asset management pipeline
+4. ✅ Message-based communication
+5. ✅ Reference counting for resources
+
+### Performance Notes
+- Automatic texture cleanup through reference counting
+- Asynchronous asset loading
+- Message queuing for performance optimization
+- Efficient buffer management
 
 ### [PR:1 Triangles](https://github.com/Cyrus-0101/koru-ts/pull/1)
 
@@ -441,15 +535,63 @@ The PR establishes a robust foundation for asset management and component commun
 - Added asset load completion messaging
 - Implemented message-based asset state updates
 
+
+### [PR:4 Texture System Implementation](https://github.com/Cyrus-0101/koru-ts/pull/4)
+
+This PR implements texture loading and management with reference counting:
+
+1. **Texture Management**
+   - Added `TextureManager` singleton for centralized texture handling
+   - Implemented reference counting for automatic cleanup
+   - Added texture caching to prevent duplicate loading
+   ```typescript
+   // Get a texture (creates or increments reference)
+   const texture = TextureManager.getTexture("player.png");
+   
+   // Release when done (decrements reference)
+   TextureManager.releaseTexture("player.png");
+   ```
+
+2. **Asset Loading System**
+   - Implemented asynchronous texture loading
+   - Added message-based load notifications
+   - Created placeholder white texture during load
+   ```typescript
+   // Load texture asynchronously
+   AssetManager.loadAsset("player.png");
+   
+   // Listen for load completion
+   Message.subscribe("ASSET_LOADED", this);
+   ```
+
+3. **Sprite System Updates**
+   - Added texture coordinate support
+   - Implemented UV mapping for sprites
+   - Added texture binding in render pipeline
+   ```typescript
+   const sprite = new Sprite("player", "player.png");
+   sprite.load();  // Sets up vertices and UVs
+   sprite.draw();  // Binds texture and renders
+   ```
+
+4. **WebGL Integration**
+   - Added texture parameter configuration
+   - Implemented texture unit management
+   - Added texture uniform support in shaders
+
 ## Next Steps
 
-- [ ] Add texture support
+- [x] Add texture support
 - [ ] Implement camera system
-- [ ] Add basic 2D sprite rendering
+- [x] Add basic 2D sprite rendering
 - [ ] Implement basic physics
 - [ ] Add input handling
 - [ ] Implement scene graph
-- [ ] Add asset loading system
+- [x] Add asset loading system
+- [ ] Add texture atlasing
+- [ ] Implement sprite batching
+- [x] Add mipmap support
+- [ ] Implement texture compression
 
 ## Development
 

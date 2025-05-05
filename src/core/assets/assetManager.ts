@@ -78,12 +78,13 @@ export class AssetManager {
    * @param assetName Asset identifier to retrieve
    * @returns The requested asset
    */
-  public static getAsset(assetName: string): IAsset {
+  public static getAsset(assetName: string): IAsset | undefined {
     if (AssetManager._loadAssets[assetName] !== undefined) {
       return AssetManager._loadAssets[assetName];
     } else {
       AssetManager.loadAsset(assetName);
     }
-    return AssetManager.getAsset(assetName);
+
+    return undefined;
   }
 }
