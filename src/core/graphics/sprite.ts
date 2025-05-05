@@ -1,28 +1,29 @@
 import { gl } from "../gl/gl";
 import { AttributeInfo, GLBuffer } from "../gl/glBuffer";
 import type { Shader } from "../gl/shaders";
+import { Matrix4x4 } from "../math/matrix4x4";
 import { Vector3 } from "../math/vector3";
 import { Texture } from "./texture";
 import { TextureManager } from "./textureManager";
 
 /**
- * Sprite class represents a 2D graphical object in the game
- * Handles:
- * - Vertex buffer creation and management
- * - Attribute configuration
- * - Draw call handling
- * - Size and position management
- * - Texture management
+ * Sprite - 2D textured quad renderer
  *
- * Memory Layout:
- * Each vertex contains:
- * - Position (vec3: x, y, z)
+ * Features:
+ * - Vertex buffer management
+ * - Texture coordinate mapping
+ * - Position transformation
+ * - Color tinting support
+ * - Reference-counted textures
  *
- * Future:
- * - Texture coordinates (vec2: u, v)
- * - Color (vec4: r, g, b, a)
- * - Rotation support
- * - Scale transformations
+ * Memory Layout (per vertex):
+ * - Position: vec3 (x, y, z)
+ * - TexCoord: vec2 (u, v)
+ *
+ * Uniforms:
+ * - u_model: Model transformation matrix
+ * - u_tint: Color tint (vec4)
+ * - u_diffuse: Texture sampler
  */
 export class Sprite {
   /** Unique identifier for this sprite */
@@ -72,10 +73,12 @@ export class Sprite {
   }
 
   /**
-   * Initializes the sprite's graphics resources
-   * - Creates vertex buffer
-   * - Sets up attributes
-   * - Uploads vertex data to GPU
+   * Initializes sprite graphics resources
+   *
+   * Creates and configures:
+   * - Vertex buffer with positions and UVs
+   * - Attribute layouts for shader
+   * - Quad geometry with texture coordinates
    */
   public load(): void {
     // Create a new buffer object in GPU memory with 3 components per vertex (x,y,z)
@@ -186,22 +189,36 @@ export class Sprite {
   public update(time: number): void {}
 
   /**
-   * Renders the sprite using its vertex buffer
+   * Renders sprite with current transform and texture
    *
-   * Process:
-   * 1. Activates and binds texture
-   * 2. Binds vertex buffer
-   * 3. Sets up attributes
-   * 4. Issues draw call
+   * Pipeline:
+   * 1. Update model matrix uniform (position)
+   * 2. Set color tint uniform
+   * 3. Bind texture to unit 0
+   * 4. Set texture sampler uniform
+   * 5. Bind and draw vertex buffer
    *
    * @param shader Shader program to use for rendering
    */
   public draw(shader: Shader): void {
+    // Update model matrix with current position
+    let modelLocation = shader.getUniformLocation("u_model");
+    gl.uniformMatrix4fv(
+      // Translate Z
+      modelLocation,
+      false,
+      new Float32Array(Matrix4x4.translation(this.position).data)
+    );
+
+    // Set color tint (currently orange)
+    let colorLocation = shader.getUniformLocation("u_tint");
+    gl.uniform4f(colorLocation, 1, 0.5, 0, 1); // Orange color
+
     // Activate and bind texture for this sprite
     this._texture.activateAndBind(0);
 
+    // u_diffuse in fragment shader samples from this unit
     let diffuseLocation = shader.getUniformLocation("u_diffuse");
-
     gl.uniform1i(diffuseLocation, 0);
 
     // Bind buffer
