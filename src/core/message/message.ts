@@ -91,11 +91,11 @@ export class Message {
   }
 
   /**
-   * Subscribes a handler to receive messages of a specific type.
+   * Subscribes the provided handler to receive messages of a specific code.
    * Adds handler to MessageBus subscription list for specified message type
    *
    * @param code Message type to listen for (e.g., "COLLISION", "GAME_OVER")
-   * @param handler Component implementing IMessageHandler interface
+   * @param handler Message Handler to be called when a message containing the provided code is sent
    *
    * Example:
    * ```typescript
@@ -112,7 +112,7 @@ export class Message {
    * }
    * ```
    *
-   * Note: If handler is already subscribed to this message type,
+   * Note: If handler is already subscribed to this message code,
    * MessageBus will log a warning and prevent duplicate subscription
    */
   public static subscribe(code: string, handler: IMessageHandler): void {
@@ -120,11 +120,11 @@ export class Message {
   }
 
   /**
-   * Unsubscribes a handler from receiving messages of a specific type.
+   * Unsubscribes the provided handler from receiving messages of a specific code.
    * Removes the handler from the MessageBus subscription list
    *
-   * @param code Message type to stop listening for
-   * @param handler Component to unsubscribe
+   * @param code Code to stop listening for
+   * @param handler Message Handler to unsubscribe
    *
    * Example:
    * ```typescript
