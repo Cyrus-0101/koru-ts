@@ -44,11 +44,15 @@ export class Transform {
    *
    * @returns Matrix4x4 containing all transformations
    */
-  public getTransformatioMatrix(): Matrix4x4 {
+  public getTransformationMatrix(): Matrix4x4 {
     let translation = Matrix4x4.translation(this.position);
     // TO-DO: Add x and y for 3D
 
-    let rotation = Matrix4x4.scale(this.scale);
+    let rotation = Matrix4x4.rotationXYZ(
+      this.rotation.x,
+      this.rotation.y,
+      this.rotation.z
+    );
     let scale = Matrix4x4.scale(this.scale);
 
     // Order matters: (T * R) * S
