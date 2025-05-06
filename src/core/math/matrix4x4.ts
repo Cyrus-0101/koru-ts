@@ -23,31 +23,34 @@ export class Matrix4x4 {
   /**
    * Internal array storing matrix values in column-major order
    * For perspective projection:
+   * ```sh
    * [
    *   (2n)/(r-l),      0,            (r+l)/(r-l),     0,
    *        0,     (2n)/(t-b),        (t+b)/(t-b),     0,
    *        0,          0,        -(f+n)/(f-n),   -(2fn)/(f-n),
    *        0,          0,              -1,            0
    * ]
-   *
+   *```
    * Where:
-   * n = near plane distance
-   * f = far plane distance
-   * l = left plane
-   * r = right plane
-   * t = top plane
-   * b = bottom plane
+   * - n = near plane distance
+   * - f = far plane distance
+   * - l = left plane
+   * - r = right plane
+   * - t = top plane
+   * - b = bottom plane
    */
   private _data: number[] = [];
 
   /**
    * Creates a new Matrix4x4 initialized as identity matrix
+   * ```sh
    * [
    *   1, 0, 0, 0,
    *   0, 1, 0, 0,
    *   0, 0, 1, 0,
    *   0, 0, 0, 1
    * ]
+   * ```
    */
   private constructor() {
     // Identity Matrix
@@ -74,12 +77,14 @@ export class Matrix4x4 {
    * Creates an orthographic projection matrix
    *
    * Orthographic Matrix Structure:
+   * ```sh
    * [
    *   2/(r-l),    0,         0,        -(r+l)/(r-l),
    *      0,    2/(t-b),      0,        -(t+b)/(t-b),
    *      0,       0,     2/(n-f),      -(f+n)/(n-f),
    *      0,       0,         0,             1
    * ]
+   * ```
    *
    * Used for:
    * - 2D rendering
@@ -142,13 +147,15 @@ export class Matrix4x4 {
    * Creates a translation matrix from a Vector3 position
    *
    * Translation Matrix Structure:
+   * ```sh
    * [
-   *   1, 0, 0, x,  // x = position.x
-   *   0, 1, 0, y,  // y = position.y
-   *   0, 0, 1, z,  // z = position.z
+   *   1, 0, 0, x,  # x = position.x
+   *   0, 1, 0, y,  # y = position.y
+   *   0, 0, 1, z,  # z = position.z
    *   0, 0, 0, 1
    * ]
-   *
+   *```
+
    * Used for:
    * - Moving objects in 3D space
    * - Positioning sprites
@@ -235,8 +242,8 @@ export class Matrix4x4 {
 
     m._data[0] = c;
     m._data[1] = s;
-    m._data[5] = -s;
-    m._data[6] = c;
+    m._data[4] = -s;
+    m._data[5] = c;
 
     return m;
   }
@@ -352,6 +359,9 @@ export class Matrix4x4 {
 
   /**
    * Copies values from another matrix
+   *
+   * Brute Force - Subpar
+   *
    * @param m Source matrix to copy from
    */
   public copyFrom(m: Matrix4x4): void {
