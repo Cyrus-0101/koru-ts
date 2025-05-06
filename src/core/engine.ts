@@ -2,6 +2,10 @@ import { AssetManager } from "./assets/assetManager";
 import { gl, GLUtilities } from "./gl/gl";
 import { AttributeInfo, GLBuffer } from "./gl/glBuffer";
 import { Shader } from "./gl/shaders";
+import { BasicShader } from "./gl/shaders/basicShader";
+import { Color } from "./graphics/color";
+import { Material } from "./graphics/material";
+import { MaterialManager } from "./graphics/materialManager";
 import { Sprite } from "./graphics/sprite";
 import { Matrix4x4 } from "./math/matrix4x4";
 import { MessageBus } from "./message/messageBus";
@@ -11,22 +15,25 @@ import { vertexShaderSource } from "./shaders/basic.vert";
 /**
  * KoruTSEngine - Core Game Engine Class
  *
- * Responsible for:
- * - Managing the game loop
- * - Handling WebGL context
- * - Resource loading and management
- * - Scene rendering and updates
- * - Window resizing
+ * Responsibilities:
+ * - Game loop management and frame timing
+ * - WebGL context and canvas management
+ * - Asset and material management
+ * - Sprite rendering pipeline
+ * - Window resize handling
  *
  * Architecture:
- * - Uses WebGL for hardware-accelerated rendering
- * - Implements a basic sprite rendering system
- * - Handles projection and model transformations
- * - Manages shader programs and uniforms
+ * - Uses MessageBus for component communication
+ * - Implements projection matrix for 2D rendering
+ * - Manages material and texture resources
+ * - Handles shader uniform updates
  *
- * WebGL References:
- * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API
- * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext
+ * Performance:
+ * - Uses requestAnimationFrame for optimal timing
+ * - Caches uniform locations
+ * - Updates projection only on resize
+ * - Manages frame synchronization
+ * - Efficient sprite rendering
  */
 export class KoruTSEngine {
   /** Counter for tracking frame updates and performance monitoring */
@@ -35,19 +42,15 @@ export class KoruTSEngine {
   /** Canvas element where WebGL context is created and rendering occurs */
   private _canvas!: HTMLCanvasElement;
 
-  /**
-   * Shader program containing vertex and fragment shaders
-   * Handles transformation and coloring of geometry
-   */
-  private _shader!: Shader;
+  /** Basic shader for 2D sprite rendering */
+  private _basicShader!: BasicShader;
 
   /** Sprite for rendering */
   private _sprite!: Sprite;
 
   /**
-   * Projection matrix for transforming 3D coordinates to screen space
-   * Configured as orthographic projection for 2D rendering
-   * Maps world coordinates to normalized device coordinates (-1 to +1)
+   * Orthographic projection matrix
+   * Maps game world to screen coordinates
    */
   private _projection!: Matrix4x4;
 
@@ -58,10 +61,16 @@ export class KoruTSEngine {
   public constructor() {}
 
   /**
-   * Initializes and starts the game engine
-   * - Sets up WebGL context and canvas
-   * - Shaders
-   * - Initial game objects
+   * Initializes engine systems and starts game loop
+   *
+   * Process:
+   * 1. Sets up WebGL context and canvas
+   * 2. Initializes asset management
+   * 3. Creates and configures shader programs
+   * 4. Registers default materials
+   * 5. Sets up projection matrix
+   * 6. Sets up sprite
+   * 7. Starts render loop
    */
   public start(): void {
     // Initialize WebGL context and get canvas reference
@@ -73,24 +82,35 @@ export class KoruTSEngine {
     gl.clearColor(0, 0, 0, 1);
 
     // Load and activate shader programs for rendering
-    this.loadShaders();
-    this._shader.use();
+    this._basicShader = new BasicShader();
+    this._basicShader.use();
 
-    // Load matrix with params
+    // Register default material with blue tint
+    MaterialManager.registerMaterial(
+      new Material(
+        "crate",
+        "assets/textures/crate.jpg",
+        new Color(0, 128, 255, 255)
+      )
+    );
+
+    // Configure orthographic projection for 2D rendering
     this._projection = Matrix4x4.orthographic(
       0,
       this._canvas.width,
-      0,
       this._canvas.height,
+      0,
       -100.0,
       100.0
     );
 
-    // Create and load test sprite
-    this._sprite = new Sprite("test", "assets/textures/crate.jpg");
+    // Create and load sprite
+    this._sprite = new Sprite("test", "crate");
     this._sprite.load();
 
     this._sprite.position.x = 200;
+    this._sprite.position.y = 100;
+
     // Configure initial viewport and canvas size
     this.resize();
 
@@ -99,12 +119,15 @@ export class KoruTSEngine {
   }
 
   /**
-   * Main game loop - Heart of the engine
-   * Executes every frame (typically 60fps) and handles:
-   * 1. Clear previous frame's render
-   * 2 Object updates
-   * 3 Rendering
-   * 4. Schedule next frame
+   * Main game loop
+   * Executes every frame (targeted 60fps)
+   *
+   * Process:
+   * 1. Update message system
+   * 2. Clear previous frame
+   * 3. Update projection uniforms
+   * 4. Render sprites
+   * 5. Schedule next frame
    */
   private loop(): void {
     // MessageBus updating
@@ -113,13 +136,8 @@ export class KoruTSEngine {
     // Clear the color buffer to remove previous frame
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    // Set uniforms
-    let colorPosition = this._shader.getUniformLocation("u_tint");
-
-    gl.uniform4f(colorPosition, 1, 0.5, 0, 1); // Orange color
-    // gl.uniform4f(colorPosition, 1, 1, 1, 1);
-
-    let projectionPosition = this._shader.getUniformLocation("u_projection");
+    let projectionPosition =
+      this._basicShader.getUniformLocation("u_projection");
 
     gl.uniformMatrix4fv(
       projectionPosition,
@@ -127,17 +145,8 @@ export class KoruTSEngine {
       new Float32Array(this._projection.data)
     );
 
-    let modelLocation = this._shader.getUniformLocation("u_model");
-
-    gl.uniformMatrix4fv(
-      // Translate Z
-      modelLocation,
-      false,
-      new Float32Array(Matrix4x4.translation(this._sprite.position).data)
-    );
-
     // Draw Sprite
-    this._sprite.draw(this._shader);
+    this._sprite.draw(this._basicShader);
 
     // Schedule next frame using requestAnimationFrame
     // bind(this) ensures correct 'this' context in the callback
@@ -146,30 +155,29 @@ export class KoruTSEngine {
 
   /**
    * Handles window resize events
-   * Adjusts canvas size to match window dimensions for proper display
+   *
+   * Updates:
+   * - Canvas dimensions
+   * - WebGL viewport
+   * - Projection matrix
+   *
+   * Note: Called automatically on window resize
    */
   public resize(): void {
     if (this._canvas !== undefined) {
       this._canvas.width = window.innerWidth;
       this._canvas.height = window.innerHeight;
 
-      // Normalized Device coordinates - how webGL represents triangles
-      // gl.viewport(-1, 1, -1, 1);
-    }
-  }
+      gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-  /**
-   * Sets up basic shader programs
-   * Creates and compiles:
-   * - Vertex shader: Handles vertex positions
-   * - Fragment shader: Sets pixel colors
-   */
-  private loadShaders(): void {
-    // Create new shader program with both shaders
-    this._shader = new Shader(
-      "basic",
-      vertexShaderSource,
-      fragmentShaderSource
-    );
+      this._projection = Matrix4x4.orthographic(
+        0,
+        this._canvas.width,
+        this._canvas.height,
+        0,
+        -100.0,
+        100.0
+      );
+    }
   }
 }

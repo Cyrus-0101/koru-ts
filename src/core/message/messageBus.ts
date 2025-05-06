@@ -6,31 +6,34 @@ import { MessageSubscriptionNode } from "./messageSubscriptionNode";
  * MessageBus - Central message distribution system
  *
  * Responsibilities:
- * - Register message handlers
- * - Distribute messages to handlers
- * - Manage message priorities
- * - Handle message queuing
+ * - Message handler registration and removal
+ * - Priority-based message distribution
+ * - Message queuing for NORMAL priority
+ * - Immediate dispatch for HIGH priority
  *
  * Design Pattern: Pub/Sub (Publisher/Subscriber)
- * Provides decoupled communication between game components
+ * - Publishers: Any component that posts messages
+ * - Subscribers: Components implementing IMessageHandler
+ * - Topics: Message codes (e.g., "COLLISION", "ASSET_LOADED")
  */
 export class MessageBus {
-  /** Handlers mapped by message code */
+  /** Maps message codes to their subscribed handlers */
   private static _subscription: { [code: string]: IMessageHandler[] } = {};
 
-  /** Maximum normal priority messages processed per update */
+  /** Limits messages processed per update for performance */
   private static _normalQueueMessagePerUpdate: number = 10;
 
-  /** Queue for normal priority messages */
+  /** Queue for NORMAL priority messages */
   private static _normalMessageQueue: MessageSubscriptionNode[] = [];
 
-  /** Private constructor prevents instantiation */
+  /** Prevents instantiation - all methods are static */
   private constructor() {}
 
   /**
    * Registers a handler for a specific message code
-   * @param code Message type to subscribe to
-   * @param handler Component that will handle the message
+   * @param code Message code to identifier (e.g., "COLLISION")
+   * @param handler Component that processes the message
+   * @throws Warning if attempting duplicate subscription
    */
   public static addSubscription(code: string, handler: IMessageHandler): void {
     if (MessageBus._subscription[code] === undefined) {
@@ -49,9 +52,10 @@ export class MessageBus {
   }
 
   /**
-   * Unregisters a handler from a message code
+   * Unregisters a handler's subscription.
    * @param code Message type to unsubscribe from
    * @param handler Handler to remove
+   * @throws Warning if code or handler not found
    */
   public static removeSubscription(
     code: string,
@@ -74,9 +78,9 @@ export class MessageBus {
   }
 
   /**
-   * Posts a message for distribution
+   * Distributes a message to subscribed handlers
    * - HIGH priority: Processed immediately
-   * - NORMAL priority: Queued for next update
+   * - NORMAL priority: Added to queue for next update
    * @param message Message to distribute
    */
   public static post(message: Message): void {
@@ -100,9 +104,11 @@ export class MessageBus {
   }
 
   /**
-   * Processes queued normal priority messages
-   * Called each frame by game engine
-   * @param time Current game time
+   * Processes queued NORMAL priority messages
+   * - Called each frame during engine update
+   * - Processes up to _normalQueueMessagePerUpdate messages
+   *
+   * @param time Current engine time
    */
   public static update(time: number): void {
     if (MessageBus._normalMessageQueue.length === 0) {

@@ -1,52 +1,42 @@
 import { gl } from "./gl";
 
 /**
- * Shader class handles the compilation and management of WebGL shader programs
- * Shaders are small programs that run on the GPU and determine how objects are rendered
+ * Shader - Base class for WebGL shader program management
  *
- * Two main types of shaders:
- * 1. Vertex Shader: Processes vertex data (positions, normals, etc.)
- *    - Transforms 3D coordinates into 2D screen coordinates
- *    - Handles vertex-level calculations (position, lighting, etc.)
+ * Responsibilities:
+ * - Shader program compilation and linking
+ * - Attribute and uniform location caching
+ * - Program activation and state management
  *
- * 2. Fragment Shader (Pixel Shader): Processes pixel-level data
- *    - Determines the final color of each pixel
- *    - Handles texturing, lighting calculations, and effects
+ * Architecture:
+ * - Abstract class requiring implementation of shader sources
+ * - Handles WebGL shader lifecycle
+ * - Caches locations for performance
+ *
+ * WebGL Integration:
+ * - Manages WebGLProgram creation and setup
+ * - Handles shader compilation errors
+ * - Provides uniform/attribute access
  */
-export class Shader {
-  /** Name identifier for the shader program */
+export abstract class Shader {
+  /** Unique name identifier for the shader program */
   private _name: string;
 
   /** WebGL program object that combines vertex and fragment shaders */
   private _program!: WebGLProgram;
 
-  /** HashMap with values for our attributes default {} */
+  /** Cache of attribute locations for faster rendering */
   private _attributes: { [name: string]: number } = {};
 
+  /** Cache of uniform locations for faster updates */
   private _uniforms: { [name: string]: WebGLUniformLocation | null } = {};
 
   /**
    * Creates a new shader program
    * @param name Identifier for the shader program
-   * @param vertexSource GLSL source code for the vertex shader
-   * @param fragmentSource GLSL source code for the fragment shader
    */
-  public constructor(
-    name: string,
-    vertexSource: string,
-    fragmentSource: string
-  ) {
+  public constructor(name: string) {
     this._name = name;
-    // Compile both vertex and fragment shaders
-    let vertexShader = this.loadShader(vertexSource, gl.VERTEX_SHADER);
-    let fragmentShader = this.loadShader(fragmentSource, gl.FRAGMENT_SHADER);
-
-    // Create and link the shader program
-    this.createProgram(vertexShader, fragmentShader);
-
-    this.detectAttributes();
-
-    this.detectUniforms();
   }
 
   /**
@@ -58,17 +48,17 @@ export class Shader {
   }
 
   /**
-   * Activates this shader program for rendering
-   * Makes this shader the active program in the WebGL context
+   * Activates this shader for rendering
+   * Must be called before setting uniforms or drawing
    */
   public use(): void {
     gl.useProgram(this._program);
   }
 
   /**
-   * Gets the location of an attribute with the provided name.
-   * @param name - The name of the attribute location to retrieve
-   * @returns number OR NULL if not found
+   * Gets cached attribute location
+   * @param name Attribute name in GLSL shader
+   * @throws Error if attribute doesn't exist
    */
   public getAttributeLocation(name: string): number {
     if (this._attributes[name] === undefined) {
@@ -81,9 +71,9 @@ export class Shader {
   }
 
   /**
-   * Gets the location of a uniform with the provided name
-   * @param name The name of the uniform to retrieve
-   * @returns WebGLUniformLocation or null if not found
+   * Gets cached uniform location
+   * @param name Uniform name in GLSL shader
+   * @throws Error if uniform doesn't exist
    */
   public getUniformLocation(name: string): WebGLUniformLocation | null {
     if (this._uniforms[name] === undefined) {
@@ -92,6 +82,25 @@ export class Shader {
       );
     }
     return this._uniforms[name];
+  }
+
+  /**
+   * Loads and links shader program
+   * Called by child classes to initialize shaders
+   * @param vertexSource GLSL vertex shader source
+   * @param fragmentSource GLSL fragment shader source
+   */
+  protected load(vertexSource: string, fragmentSource: string): void {
+    // Compile both vertex and fragment shaders
+    let vertexShader = this.loadShader(vertexSource, gl.VERTEX_SHADER);
+    let fragmentShader = this.loadShader(fragmentSource, gl.FRAGMENT_SHADER);
+
+    // Create and link the shader program
+    this.createProgram(vertexShader, fragmentShader);
+
+    this.detectAttributes();
+
+    this.detectUniforms();
   }
 
   /**

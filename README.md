@@ -238,6 +238,73 @@ const texture = TextureManager.getTexture("player.png");
 TextureManager.releaseTexture("player.png");
 ```
 
+#### [`Material`](src/core/graphics/material.ts)
+
+Combines textures and colors for rendering configuration.
+
+**Responsibilities:**
+- Texture and color tint management
+- Reference counting integration
+- WebGL uniform configuration
+- Resource lifecycle handling
+
+**Example:**
+```typescript
+// Create material with texture and blue tint
+const material = new Material(
+    "crate",
+    "assets/textures/crate.jpg",
+    new Color(0, 128, 255, 255)
+);
+
+// Use in sprite
+sprite.setMaterial(material);
+```
+
+#### [`MaterialManager`](src/core/graphics/materialManager.ts)
+
+Singleton system for material resource management.
+
+**Responsibilities:**
+- Material caching and reuse
+- Reference counting for materials
+- Automatic cleanup of unused materials
+- Memory optimization
+
+**Example:**
+```typescript
+// Register a new material
+MaterialManager.registerMaterial(material);
+
+// Get existing material (increments reference)
+const material = MaterialManager.getMaterial("crate");
+
+// Release when done
+MaterialManager.releaseMaterial("crate");
+```
+
+#### [`Color`](src/core/graphics/color.ts)
+
+RGBA color representation with WebGL compatibility.
+
+**Responsibilities:**
+- Color component management (RGBA)
+- WebGL-compatible format conversion
+- Common color preset support
+- Alpha transparency support
+
+**Example:**
+```typescript
+// Create custom color
+const purple = new Color(128, 0, 128, 255);
+
+// Get WebGL format
+const glColor = purple.toFloat32Array();
+
+// Use preset
+const white = Color.white();
+```
+
 ### Current Features
 1. **Rendering System**
 - WebGL context management
@@ -341,6 +408,9 @@ src/
 │   ├── graphics/
 │   │   ├── texture.ts                      # WebGL texture management
 │   │   ├── textureManager.ts               # Texture reference counting
+│   │   ├── material.ts                     # Material definition & management
+│   │   ├── materialManager.ts              # Material reference counting
+│   │   ├── color.ts                        # RGBA color management
 │   │   └── sprite.ts                       # 2D sprite rendering
 │   ├── message/
 │   │   ├── messageBus.ts                   # Message distribution system
@@ -354,11 +424,13 @@ src/
 │   ├── gl/
 │   │   ├── gl.ts                           # WebGL context management
 │   │   ├── glBuffer.ts                     # Buffer operations
-│   │   └── shaders.ts                      # Shader compilation
+│   │   └── shaders/                        # Shader implementations
+│   │       ├── shaders.ts                  # Base shader class
+│   │       └── basicShader.ts              # Basic material shader
 │   └── engine.ts                           # Main engine class
 ├── shaders/
-│   ├── basic.vert.ts                       # Basic vertex shader
-│   └── basic.frag.ts                       # Basic fragment shader
+│   ├── basic.vert.ts                       # Basic vertex shader source
+│   └── basic.frag.ts                       # Basic fragment shader source
 ├── index.html                              # Entry point
 ├── app.ts                                  # Application setup
 └── tsconfig.json                           # TypeScript config
@@ -578,6 +650,74 @@ This PR implements texture loading and management with reference counting:
    - Added texture parameter configuration
    - Implemented texture unit management
    - Added texture uniform support in shaders
+
+### [PR:5 Material System Implementation](https://github.com/Cyrus-0101/koru-ts/pull/4)
+
+This PR implements a complete material system with color tinting and texture management:
+
+1. **Material Management**
+   - Added MaterialManager singleton for centralized handling
+   - Implemented reference counting for materials
+   - Added material caching to prevent duplicates
+   ```typescript
+   // Register a new material
+   MaterialManager.registerMaterial(new Material(
+     "crate",
+     "assets/textures/crate.jpg",
+     new Color(0, 128, 255, 255)
+   ));
+   
+   // Get material (increments reference)
+   const material = MaterialManager.getMaterial("crate");
+   ```
+
+2. **Color System**
+   - Added Color class for RGBA management
+   - Implemented WebGL-compatible color formats
+   - Added common color presets
+   ```typescript
+   // Create custom color with alpha
+   const tint = new Color(255, 128, 0, 255);  // Orange
+   
+   // Convert for WebGL use
+   const glColor = tint.toFloat32Array();
+   ```
+
+3. **Sprite Integration**
+   - Updated sprites to use materials
+   - Added color tinting support
+   - Implemented material reference management
+   ```typescript
+   // Create sprite with material
+   const sprite = new Sprite("player", "crate");
+   sprite.load();
+   
+   // Material color affects rendering
+   sprite.draw(shader);  // Uses material's texture and tint
+   ```
+
+4. **Shader Updates**
+   - Added material uniform support
+   - Implemented texture sampling
+   - Added color tinting in fragment shader
+   ```glsl
+   // Fragment shader with material support
+   uniform vec4 u_tint;        // Material color
+   uniform sampler2D u_diffuse;  // Material texture
+   
+   void main() {
+    gl_FragColor = texture2D(u_diffuse, v_texCoord) * u_tint;
+   }
+   ```
+
+5. **Resource Management**
+   - Automatic cleanup of unused materials
+   - Reference counting for textures and materials
+   - Memory optimization through shared resources
+   ```typescript
+   // Material cleanup
+   MaterialManager.releaseMaterial("crate");  // Decrements reference
+   ```
 
 ## Next Steps
 

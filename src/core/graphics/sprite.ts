@@ -1,31 +1,37 @@
 import { gl } from "../gl/gl";
 import { AttributeInfo, GLBuffer } from "../gl/glBuffer";
 import type { Shader } from "../gl/shaders";
+import { Matrix4x4 } from "../math/matrix4x4";
 import { Vector3 } from "../math/vector3";
-import { Texture } from "./texture";
-import { TextureManager } from "./textureManager";
+import { Material } from "./material";
+import { MaterialManager } from "./materialManager";
 
 /**
- * Sprite class represents a 2D graphical object in the game
- * Handles:
- * - Vertex buffer creation and management
- * - Attribute configuration
- * - Draw call handling
- * - Size and position management
- * - Texture management
+ * Sprite - 2D textured quad renderer with material support
  *
- * Memory Layout:
- * Each vertex contains:
- * - Position (vec3: x, y, z)
+ * Features:
+ * - Material-based rendering
+ * - Vertex buffer management
+ * - Position transformation
+ * - UV coordinate mapping
+ * - Reference-counted textures
  *
- * Future:
- * - Texture coordinates (vec2: u, v)
- * - Color (vec4: r, g, b, a)
- * - Rotation support
- * - Scale transformations
+ * Memory Layout (per vertex):
+ * - Position: vec3 (x, y, z) offset: 0
+ * - TexCoord: vec2 (u, v)    offset: 3
+ *
+ * Shader Requirements:
+ * Uniforms:
+ * - u_model: Model transformation matrix - mat4       // Model transformation
+ * - u_tint: Color tint (vec4)            - vec4       // Material Color Tint
+ * - u_diffuse: Texture sampler           - sampler2D  // Texture Unit 0
+ *
+ * Attributes:
+ * - a_position: vec3  // location 0
+ * - a_texCoord: vec2  // location 1
  */
 export class Sprite {
-  /** Unique identifier for this sprite */
+  /** Unique identifier for this sprite instance */
   private _name: string;
 
   /** Width in pixels/units */
@@ -34,32 +40,28 @@ export class Sprite {
   /** Height in pixels/units */
   private _height: number;
 
-  /**
-   * Vertex Buffer Object (VBO) storing geometry data
-   * Contains vertex positions for rendering
-   * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLBuffer
-   */
+  /** GPU vertex buffer containing positions and UVs */
   private _buffer!: GLBuffer;
 
   /** Position in world space */
   public position: Vector3 = new Vector3();
 
-  /** Texture instance for this sprite */
-  private _texture: Texture;
+  /** Reference to material for rendering */
+  private _material: Material | undefined;
 
-  /** Name/path of the texture resource */
-  private _textureName: string;
+  /** Identifier for material lookup */
+  private _materialName: string | undefined;
 
   /**
    * Creates a new sprite instance
    * @param name Unique identifier for this sprite
-   * @param textureName The name of the texture to use with the sprite
+   * @param materialName The name of the material to use with the sprite
    * @param width Width in pixels/units (default: 100)
    * @param height Height in pixels/units (default: 100)
    */
   public constructor(
     name: string,
-    textureName: string,
+    materialName: string,
     width: number = 100,
     height: number = 100
   ) {
@@ -67,15 +69,17 @@ export class Sprite {
     this._width = width;
     this._height = height;
 
-    this._textureName = textureName;
-    this._texture = TextureManager.getTexture(this._textureName);
+    this._materialName = materialName;
+
+    this._material = MaterialManager.getMaterial(this._materialName);
   }
 
   /**
-   * Initializes the sprite's graphics resources
-   * - Creates vertex buffer
-   * - Sets up attributes
-   * - Uploads vertex data to GPU
+   * Initializes sprite geometry and GPU resources
+   * - Creates vertex buffer with interleaved data
+   * - Sets up attribute pointers for shader
+   * - Uploads quad geometry with UVs
+   * - Configures winding order for face culling
    */
   public load(): void {
     // Create a new buffer object in GPU memory with 3 components per vertex (x,y,z)
@@ -165,14 +169,18 @@ export class Sprite {
 
   /**
    * Cleans up sprite resources
-   * - Destroys vertex buffer
-   * - Releases texture reference
+   * - Destroys vertex buffer in GPU Memory
+   * - Releases material reference
+   * - Clears material references
    *
    * Should be called when sprite is no longer needed
    */
   public destroy(): void {
     this._buffer.destroy();
-    TextureManager.releaseTexture(this._textureName);
+    MaterialManager.releaseMaterial(this._materialName!);
+
+    this._material = undefined;
+    this._materialName = undefined;
   }
 
   /**
@@ -186,23 +194,43 @@ export class Sprite {
   public update(time: number): void {}
 
   /**
-   * Renders the sprite using its vertex buffer
+   * Renders sprite using provided shader
    *
-   * Process:
-   * 1. Activates and binds texture
-   * 2. Binds vertex buffer
-   * 3. Sets up attributes
-   * 4. Issues draw call
+   * Pipeline:
+   * 1. Update model matrix with position
+   * 2. Set material color tint
+   * 3. Bind diffuse texture to unit 0
+   * 4. Configure texture sampler
+   * 5. Draw vertex buffer
    *
-   * @param shader Shader program to use for rendering
+   * @param shader Shader to use for rendering
    */
   public draw(shader: Shader): void {
-    // Activate and bind texture for this sprite
-    this._texture.activateAndBind(0);
+    // Update model matrix with current position
+    let modelLocation = shader.getUniformLocation("u_model");
+    gl.uniformMatrix4fv(
+      // Translate Z
+      modelLocation,
+      false,
+      new Float32Array(Matrix4x4.translation(this.position).data)
+    );
 
-    let diffuseLocation = shader.getUniformLocation("u_diffuse");
+    // Set color tint (currently orange)
+    let colorLocation = shader.getUniformLocation("u_tint");
 
-    gl.uniform1i(diffuseLocation, 0);
+    gl.uniform4fv(
+      colorLocation,
+      this._material?.tint?.toFloat32Array() ?? new Float32Array([1, 0.5, 0, 1])
+    ); // Default to orange if no material/tint
+
+    if (this._material?.diffuseTexture !== undefined) {
+      // Activate and bind texture for this sprite
+      this._material.diffuseTexture.activateAndBind(0);
+
+      // u_diffuse in fragment shader samples from this unit
+      let diffuseLocation = shader.getUniformLocation("u_diffuse");
+      gl.uniform1i(diffuseLocation, 0);
+    }
 
     // Bind buffer
     this._buffer.bind();
