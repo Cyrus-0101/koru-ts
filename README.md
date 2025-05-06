@@ -651,7 +651,7 @@ This PR implements texture loading and management with reference counting:
    - Implemented texture unit management
    - Added texture uniform support in shaders
 
-### [PR:5 Material System Implementation](https://github.com/Cyrus-0101/koru-ts/pull/4)
+### [PR:5 Material System Implementation](https://github.com/Cyrus-0101/koru-ts/pull/5)
 
 This PR implements a complete material system with color tinting and texture management:
 
