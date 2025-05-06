@@ -74,6 +74,7 @@ export class Scene {
   public getObjectByName(name: string): void {
     this._root.getObjectByName(name);
   }
+
   /**
    * Loads all objects in scene hierarchy
    * Called when scene becomes active
