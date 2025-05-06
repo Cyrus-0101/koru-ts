@@ -3,6 +3,9 @@ import { gl, GLUtilities } from "./gl/gl";
 import { AttributeInfo, GLBuffer } from "./gl/glBuffer";
 import { Shader } from "./gl/shaders";
 import { BasicShader } from "./gl/shaders/basicShader";
+import { Color } from "./graphics/color";
+import { Material } from "./graphics/material";
+import { MaterialManager } from "./graphics/materialManager";
 import { Sprite } from "./graphics/sprite";
 import { Matrix4x4 } from "./math/matrix4x4";
 import { MessageBus } from "./message/messageBus";
@@ -15,21 +18,22 @@ import { vertexShaderSource } from "./shaders/basic.vert";
  * Responsibilities:
  * - Game loop management and frame timing
  * - WebGL context and canvas management
- * - Asset loading coordination
+ * - Asset and material management
  * - Sprite rendering pipeline
  * - Window resize handling
  *
  * Architecture:
  * - Uses MessageBus for component communication
  * - Implements projection matrix for 2D rendering
+ * - Manages material and texture resources
  * - Handles shader uniform updates
- * - Manages basic sprite rendering
  *
  * Performance:
  * - Uses requestAnimationFrame for optimal timing
  * - Caches uniform locations
  * - Updates projection only on resize
  * - Manages frame synchronization
+ * - Efficient sprite rendering
  */
 export class KoruTSEngine {
   /** Counter for tracking frame updates and performance monitoring */
@@ -58,11 +62,15 @@ export class KoruTSEngine {
 
   /**
    * Initializes engine systems and starts game loop
+   *
+   * Process:
    * 1. Sets up WebGL context and canvas
    * 2. Initializes asset management
-   * 3. Creates and configures shader
-   * 4. Sets up sprite
-   * 5. Starts render loop
+   * 3. Creates and configures shader programs
+   * 4. Registers default materials
+   * 5. Sets up projection matrix
+   * 6. Sets up sprite
+   * 7. Starts render loop
    */
   public start(): void {
     // Initialize WebGL context and get canvas reference
@@ -77,7 +85,16 @@ export class KoruTSEngine {
     this._basicShader = new BasicShader();
     this._basicShader.use();
 
-    // Load matrix with params
+    // Register default material with blue tint
+    MaterialManager.registerMaterial(
+      new Material(
+        "crate",
+        "assets/textures/crate.jpg",
+        new Color(0, 128, 255, 255)
+      )
+    );
+
+    // Configure orthographic projection for 2D rendering
     this._projection = Matrix4x4.orthographic(
       0,
       this._canvas.width,
@@ -88,7 +105,7 @@ export class KoruTSEngine {
     );
 
     // Create and load sprite
-    this._sprite = new Sprite("test", "assets/textures/crate.jpg");
+    this._sprite = new Sprite("test", "crate");
     this._sprite.load();
 
     this._sprite.position.x = 200;
