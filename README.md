@@ -2,6 +2,98 @@
 
 A WebGL-based TypeScript game engine focusing on 2D/3D rendering with modern web technologies.
 
+
+### Current Features
+
+1. **Rendering System**
+- WebGL context management
+- GLSL shader compilation and linking
+- Vertex buffer management
+- Material-based rendering
+- Sprite system with textures
+- Color tinting support
+- UV coordinate mapping
+
+2. **Resource Management**
+- Reference-counted textures and materials
+- Asynchronous asset loading
+- Automatic resource cleanup
+- Material and texture caching
+- Memory optimization through sharing
+- Hierarchical loading system
+
+3. **Mathematics**
+- Matrix4x4 transformations
+- Local/world space transforms
+- Vector2/3 operations
+- Orthographic projection
+- Transform hierarchy calculations
+- Parent-child transformations
+
+4. **Core Architecture**
+- Component-based system
+- Scene graph hierarchy
+- Zone management system
+- Message bus communication
+- Asset management pipeline
+- Game loop optimization
+- State machine integration
+
+5. **Graphics Features**
+- Material system
+- Texture unit management
+- Mipmap generation
+- Color tinting
+- Sprite transformations
+- Component-based rendering
+- Attribute handling
+
+6. **Scene Management**
+- Hierarchical scene graph
+- Zone-based level system
+- Resource lifecycle management
+- Object transformation inheritance
+- Component lifecycle handling
+- Scene state management
+
+### Next Steps
+
+- [x] Add texture support
+- [ ] Implement camera system
+- [x] Add basic 2D sprite rendering
+- [ ] Implement basic physics
+- [ ] Add input handling
+- [x] Implement scene graph
+- [x] Add asset loading system
+- [ ] Add texture atlasing
+- [ ] Implement sprite batching
+- [x] Add mipmap support
+- [ ] Implement texture compression
+
+### Development
+
+Built with:
+
+- TypeScript
+- WebGL
+- Bun v1.2.3 (for building and development)
+
+### Technical Implementation
+
+> How WebGL Works:
+
+1. JavaScript Control:
+   WebGL is controlled through JavaScript, which sends commands to the browser's GPU.
+2. Rendering Pipeline:
+   WebGL utilizes a rendering pipeline, where vertices, shaders, and other data are processed by the GPU to create 3D graphics.
+3. Shaders:
+   Shaders, written in `GLSL`, define how objects are drawn, including their appearance, lighting, and other visual effects.
+4. GPU Acceleration:
+   The GPU processes the data and shaders, rendering the 3D scene efficiently and providing high-performance graphics.
+5. Display:
+   The rendered 3D graphics are then displayed within the HTML5 `<canvas>` element.
+
+
 ## Architecture
 
 ### Core Components
@@ -305,56 +397,6 @@ const glColor = purple.toFloat32Array();
 const white = Color.white();
 ```
 
-### Current Features
-1. **Rendering System**
-- WebGL context management
-- GLSL shader compilation and linking
-- Vertex buffer management
-- Texture loading and binding
-- Sprite rendering with textures
-
-2. **Resource Management**
-- Reference-counted textures
-- Asynchronous asset loading
-- Automatic resource cleanup
-- Texture caching
-- Memory optimization
-
-3. **Mathematics**
-- Matrix4x4 transformations
-- Vector2/3 operations
-- Orthographic projection
-- UV coordinate mapping
-
-4. **Core Architecture**
-- Component messaging system
-- Asset management pipeline
-- Game loop optimization
-- Window management
-- Event handling
-
-5. **Graphics Features**
-- Texture unit management
-- Mipmap generation
-- UV coordinate support
-- Sprite transformations
-- Attribute handling
-
-## Technical Implementation
-
-How WebGL Works:
-
-1. JavaScript Control:
-   WebGL is controlled through JavaScript, which sends commands to the browser's GPU.
-2. Rendering Pipeline:
-   WebGL utilizes a rendering pipeline, where vertices, shaders, and other data are processed by the GPU to create 3D graphics.
-3. Shaders:
-   Shaders, written in `GLSL`, define how objects are drawn, including their appearance, lighting, and other visual effects.
-4. GPU Acceleration:
-   The GPU processes the data and shaders, rendering the 3D scene efficiently and providing high-performance graphics.
-5. Display:
-   The rendered 3D graphics are then displayed within the HTML5 `<canvas>` element.
-
 ### v1 Shader Implementation
 
 ```glsl
@@ -452,30 +494,6 @@ bun run build
 
 3. Open `index.html` in a browser.
 
-## Current Status
-
-The engine currently demonstrates:
-
-### Core Systems
-- WebGL context management and initialization
-- Game loop with requestAnimationFrame
-- Window/canvas management with resize handling
-- Asset loading system with async support
-- Message-based component communication
-
-### Graphics Pipeline
-- GLSL shader compilation and management
-- Vertex buffer creation and attribute handling
-- 2D sprite rendering with textures
-- Basic transformation support
-- Reference-counted texture management
-
-### Mathematics
-- 4x4 matrix operations for transformations
-- 2D/3D vector operations
-- Orthographic projection support
-- Basic geometry calculations
-
 ### Example Usage:
 ```typescript
 // Initialize engine
@@ -493,119 +511,108 @@ sprite.position.y = 200;
 engine.start();
 ```
 
-### Latest Features
-1. ✅ Texture loading and management
-2. ✅ Sprite rendering system
-3. ✅ Asset management pipeline
-4. ✅ Message-based communication
-5. ✅ Reference counting for resources
-
-### Performance Notes
-- Automatic texture cleanup through reference counting
-- Asynchronous asset loading
-- Message queuing for performance optimization
-- Efficient buffer management
-
 ### [PR:1 Triangles](https://github.com/Cyrus-0101/koru-ts/pull/1)
 
 Changes:
 
-1. Shader Management
-   Added complete shader pipeline:
+1. **Shader Management**
+   - Added complete shader pipeline:
 
-```typescript
-private loadShaders(): void {
-    let vertexShaderSource = `
-        attribute vec3 a_position;
-        void main() {
-            gl_Position = vec4(a_position, 1.0);
-        }`;
+   ```typescript
+   private loadShaders(): void {
+      let vertexShaderSource = `
+         attribute vec3 a_position;
+         void main() {
+               gl_Position = vec4(a_position, 1.0);
+         }`;
 
-    let fragmentShaderSource = `
-        precision mediump float;
-        uniform vec4 u_color;
-        void main() {
-            gl_FragColor = u_color;
-        }`;
-}
-```
+      let fragmentShaderSource = `
+         precision mediump float;
+         uniform vec4 u_color;
+         void main() {
+               gl_FragColor = u_color;
+         }`;
+   }
+   ```
 
-2. Buffer Management
-   Added GLBuffer class with:
+2. **Buffer Management**
+   - Added GLBuffer class with:
+      - Vertex buffer creation and management
+      - Attribute handling
+      - Data upload to GPU
+      - Drawing functionality
 
-- Vertex buffer creation and management
-- Attribute handling
-- Data upload to GPU
-- Drawing functionality
+3. **Triangle Rendering**
+   - Implemented basic triangle rendering:
 
-3. Triangle Rendering
-   Implemented basic triangle rendering:
-
-```typescript
-private createBuffer(): void {
-    let vertices = [
-        // x,    y,    z
-        0.0,  0.0,  0.0,  // bottom-left
-        0.0,  0.5,  0.0,  // top-left
-        0.5,  0.5,  0.0   // top-right
-    ];
-}
-```
+   ```typescript
+   private createBuffer(): void {
+      let vertices = [
+         // x,    y,    z
+         0.0,  0.0,  0.0,  // bottom-left
+         0.0,  0.5,  0.0,  // top-left
+         0.5,  0.5,  0.0   // top-right
+      ];
+   }
+   ```
 
 ### [PR:2 Sprite Rendering System Implementation](https://github.com/Cyrus-0101/koru-ts/pull/2)
+
 This PR establishes the foundation for 2D rendering in the KoruTS engine. Core Changes:
-1. Matrix4x4 Class
-- Implemented orthographic projection matrix
-- Added column-major matrix operations
-- Documentation for matrix transformations
 
-2. GLBuffer Improvements
-- Added vertex buffer management
-- Implemented attribute handling
-- Added support for different data types
-- Enhanced buffer binding operations
+1. **Matrix4x4 Class**
+   - Implemented orthographic projection matrix
+   - Added column-major matrix operations
+   - Documentation for matrix transformations
 
-3. Sprite System
-- Added basic Sprite class
-- Implemented vertex buffer creation for sprites
-- Added size and position management
-- Set up draw operations
+2. **GLBuffer Improvements**
+   - Added vertex buffer management
+   - Implemented attribute handling
+   - Added support for different data types
+   - Enhanced buffer binding operations
 
-4. Engine Updates
-- Integrated sprite rendering pipeline
-- Added projection matrix support
-- Implemented viewport management
-- Added window resize handling
+3. **Sprite System**
+   - Added basic Sprite class
+   - Implemented vertex buffer creation for sprites
+   - Added size and position management
+   - Set up draw operations
 
-**Example**
-Sprite creation and rendering:
-```typescript
-const sprite = new Sprite("test", 100, 100);
-sprite.load();  // Sets up vertex buffer
-sprite.draw();  // Renders using WebGL
-```
+4. **Engine Updates**
+   - Integrated sprite rendering pipeline
+   - Added projection matrix support
+   - Implemented viewport management
+   - Added window resize handling
+
+   **Example**
+   Sprite creation and rendering:
+   ```typescript
+   const sprite = new Sprite("test", 100, 100);
+   sprite.load();  // Sets up vertex buffer
+   sprite.draw();  // Renders using WebGL
+   ```
 
 ### [PR:3 Assets & Messages Handling](https://github.com/Cyrus-0101/koru-ts/pull/3)
+
 The PR establishes a robust foundation for asset management and component communication in the engine.
-1. Asset Management System
-- Implemented `AssetManager` singleton for centralized resource management
-- Added asset loading pipeline with support for different asset types
-- Created `IAsset` and `IAssetLoader` interfaces
-- Implemented image asset loading with 
-`ImageAssetLoader`
-- Added asset caching and state management
 
-2. Messaging System
-- Added `MessageBus` for decoupled component communication
-- Implemented priority-based message processing
-- Created message subscription and handling system
-- Added support for HIGH and NORMAL priority messages
-- Implemented message queuing for NORMAL priority
+1. **Asset Management System**
+   - Implemented `AssetManager` singleton for centralized resource management
+   - Added asset loading pipeline with support for different asset types
+   - Created `IAsset` and `IAssetLoader` interfaces
+   - Implemented image asset loading with `ImageAssetLoader`
+   - Added asset caching and state management
 
-3. Integration
-- Connected asset loading with message system for load notifications
-- Added asset load completion messaging
-- Implemented message-based asset state updates
+2. **Messaging System**
+   - Added `MessageBus` for decoupled component communication
+   - Implemented priority-based message processing
+   - Created message subscription and handling system
+   - Added support for HIGH and NORMAL priority messages
+   - Implemented message queuing for NORMAL priority
+
+3. **Integration**
+   - Connected asset loading with message system for load notifications
+   - Added asset load completion messaging
+   - Implemented message-based asset state updates
 
 
 ### [PR:4 Texture System Implementation](https://github.com/Cyrus-0101/koru-ts/pull/4)
@@ -781,29 +788,6 @@ This PR implements a robust scene graph and component system for game object man
    // Resources load through hierarchy
    scene.load();  // Loads all objects and components
    ```
-
-
-## Next Steps
-
-- [x] Add texture support
-- [ ] Implement camera system
-- [x] Add basic 2D sprite rendering
-- [ ] Implement basic physics
-- [ ] Add input handling
-- [x] Implement scene graph
-- [x] Add asset loading system
-- [ ] Add texture atlasing
-- [ ] Implement sprite batching
-- [x] Add mipmap support
-- [ ] Implement texture compression
-
-## Development
-
-Built with:
-
-- TypeScript
-- WebGL
-- Bun v1.2.3 (for building and development)
 
 ## References
 
