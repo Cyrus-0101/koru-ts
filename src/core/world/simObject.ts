@@ -1,3 +1,4 @@
+import type { BaseComponent } from "../assets/components/baseComponent";
 import type { Shader } from "../gl/shaders";
 import { Matrix4x4 } from "../math/matrix4x4";
 import { Transform } from "../math/transform";
@@ -7,17 +8,17 @@ import type { Scene } from "./scene";
  * SimObject - Base class for all game objects in the simulation
  *
  * Features:
+ * - Component-based architecture
  * - Hierarchical scene graph
  * - Local and world space transformations
  * - Parent-child relationships
  * - Object lookup by name
- * - Load/Update/Render lifecycle
  *
  * Usage:
  * ```typescript
- * const parent = new SimObject(1, "parent");
- * const child = new SimObject(2, "child");
- * parent.addChild(child);
+ * const player = new SimObject(1, "player");
+ * const renderComponent = new SpriteComponent("render", "playerSprite");
+ * player.addComponent(renderComponent);
  * ```
  */
 export class SimObject {
@@ -35,6 +36,9 @@ export class SimObject {
 
   /** Reference to containing scene */
   private _scene: Scene | undefined;
+
+  /** List of attached components */
+  private _components: BaseComponent[] = [];
 
   /** Local space transformation matrix */
   private _localMatrix: Matrix4x4 = Matrix4x4.identity();
@@ -130,12 +134,29 @@ export class SimObject {
   }
 
   /**
+   * Adds component to object
+   * Sets up component owner reference
+   * @param component Component to attach
+   */
+  public addComponent(component: BaseComponent): void {
+    this._components.push(component);
+    component.setOwner(this);
+  }
+
+  /**
    * Loads object resources
-   * Called when object enters the scene
+   * - Loads all attached components
+   * - Recursively loads child objects
    */
   public load(): void {
     this._isLoaded = true;
 
+    // Load components first
+    for (let c of this._components) {
+      c.load();
+    }
+
+    // Then load children
     for (let c of this._children) {
       c.load();
     }
@@ -143,21 +164,45 @@ export class SimObject {
 
   /**
    * Updates object state
-   * Called each frame before rendering
+   * Order:
+   * 1. Update local transform
+   * 2. Update world matrix
+   * 3. Update components
+   * 4. Update children
+   *
    * @param time Current engine time
    */
   public update(time: number): void {
+    // SubOptimal must refactor - Should only be done when tranform changes
+    this._localMatrix = this.transform.getTransformationMatrix();
+
+    this.updateWorldMatrix(
+      this._parent !== undefined ? this._parent.worldMatrix : undefined
+    );
+
+    // Update components
+    for (let c of this._components) {
+      c.update(time);
+    }
+
+    // Update children
     for (let c of this._children) {
       c.update(time);
     }
   }
 
   /**
-   * Renders object using provided shader
-   * Called each frame after update
+   * Renders object hierarchy
+   * - Renders all components
+   * - Recursively renders children
+   *
    * @param shader Shader to use for rendering
    */
   public render(shader: Shader): void {
+    for (let c of this._components) {
+      c.render(shader);
+    }
+
     for (let c of this._children) {
       c.render(shader);
     }
@@ -172,5 +217,42 @@ export class SimObject {
    */
   protected onAdded(scene: Scene): void {
     this._scene = scene;
+  }
+
+  /**
+   * Updates world transformation matrix based on parent
+   *
+   * Process:
+   * 1. If parent exists:
+   *    - Multiply parent's world matrix with local matrix
+   *    - Result combines all transformations in hierarchy
+   * 2. If no parent (root object):
+   *    - World matrix equals local matrix
+   *    - No parent transformations to apply
+   *
+   * Called during:
+   * - Object transformation changes
+   * - Parent transformation changes
+   * - Scene graph restructuring
+   *
+   * @param parentWorldMatrix Parent's world transformation matrix
+   */ private updateWorldMatrix(
+    parentWorldMatrix: Matrix4x4 | undefined
+  ): void {
+    if (parentWorldMatrix !== undefined) {
+      // Combine parent and local transformations
+      this._worldMatrix = Matrix4x4.multiply(
+        parentWorldMatrix,
+        this._localMatrix
+      );
+    } else {
+      // Root object - world equals local
+      this.worldMatrix.copyFrom(this._localMatrix);
+    }
+
+    // Recursively update children
+    for (let child of this._children) {
+      child.updateWorldMatrix(this._worldMatrix);
+    }
   }
 }
