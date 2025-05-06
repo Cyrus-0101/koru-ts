@@ -6,55 +6,55 @@ A WebGL-based TypeScript game engine focusing on 2D/3D rendering with modern web
 ### Current Features
 
 1. **Rendering System**
-- WebGL context management
-- GLSL shader compilation and linking
-- Vertex buffer management
-- Material-based rendering
-- Sprite system with textures
-- Color tinting support
-- UV coordinate mapping
+   - WebGL context management
+   - GLSL shader compilation and linking
+   - Vertex buffer management
+   - Material-based rendering
+   - Sprite system with textures
+   - Color tinting support
+   - UV coordinate mapping
 
 2. **Resource Management**
-- Reference-counted textures and materials
-- Asynchronous asset loading
-- Automatic resource cleanup
-- Material and texture caching
-- Memory optimization through sharing
-- Hierarchical loading system
+   - Reference-counted textures and materials
+   - Asynchronous asset loading
+   - Automatic resource cleanup
+   - Material and texture caching
+   - Memory optimization through sharing
+   - Hierarchical loading system
 
 3. **Mathematics**
-- Matrix4x4 transformations
-- Local/world space transforms
-- Vector2/3 operations
-- Orthographic projection
-- Transform hierarchy calculations
-- Parent-child transformations
+   - Matrix4x4 transformations
+   - Local/world space transforms
+   - Vector2/3 operations
+   - Orthographic projection
+   - Transform hierarchy calculations
+   - Parent-child transformations
 
 4. **Core Architecture**
-- Component-based system
-- Scene graph hierarchy
-- Zone management system
-- Message bus communication
-- Asset management pipeline
-- Game loop optimization
-- State machine integration
+   - Component-based system
+   - Scene graph hierarchy
+   - Zone management system
+   - Message bus communication
+   - Asset management pipeline
+   - Game loop optimization
+   - State machine integration
 
 5. **Graphics Features**
-- Material system
-- Texture unit management
-- Mipmap generation
-- Color tinting
-- Sprite transformations
-- Component-based rendering
-- Attribute handling
+   - Material system
+   - Texture unit management
+   - Mipmap generation
+   - Color tinting
+   - Sprite transformations
+   - Component-based rendering
+   - Attribute handling
 
 6. **Scene Management**
-- Hierarchical scene graph
-- Zone-based level system
-- Resource lifecycle management
-- Object transformation inheritance
-- Component lifecycle handling
-- Scene state management
+   - Hierarchical scene graph
+   - Zone-based level system
+   - Resource lifecycle management
+   - Object transformation inheritance
+   - Component lifecycle handling
+   - Scene state management
 
 ### Next Steps
 
