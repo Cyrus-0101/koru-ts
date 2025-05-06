@@ -4,7 +4,7 @@
  * Features:
  * - 8-bit per channel color storage (0-255)
  * - Float conversion for WebGL (0.0-1.0)
- * - Common color presets (white, black, etc.)
+ * - Common color presets (red, green, blue, white, black)
  * - Multiple array format outputs
  *
  * Usage:
