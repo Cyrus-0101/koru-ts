@@ -11,6 +11,7 @@ import { Matrix4x4 } from "./math/matrix4x4";
 import { MessageBus } from "./message/messageBus";
 import { fragmentShaderSource } from "./shaders/basic.frag";
 import { vertexShaderSource } from "./shaders/basic.vert";
+import { ZoneManager } from "./world/zoneManager";
 
 /**
  * KoruTSEngine - Core Game Engine Class
@@ -44,9 +45,6 @@ export class KoruTSEngine {
 
   /** Basic shader for 2D sprite rendering */
   private _basicShader!: BasicShader;
-
-  /** Sprite for rendering */
-  private _sprite!: Sprite;
 
   /**
    * Orthographic projection matrix
@@ -94,6 +92,9 @@ export class KoruTSEngine {
       )
     );
 
+    // Create a zone
+    let zoneID = ZoneManager.createTestZone();
+
     // Configure orthographic projection for 2D rendering
     this._projection = Matrix4x4.orthographic(
       0,
@@ -104,12 +105,7 @@ export class KoruTSEngine {
       100.0
     );
 
-    // Create and load sprite
-    this._sprite = new Sprite("test", "crate");
-    this._sprite.load();
-
-    this._sprite.position.x = 200;
-    this._sprite.position.y = 100;
+    ZoneManager.changeZone(zoneID);
 
     // Configure initial viewport and canvas size
     this.resize();
@@ -124,18 +120,23 @@ export class KoruTSEngine {
    *
    * Process:
    * 1. Update message system
-   * 2. Clear previous frame
-   * 3. Update projection uniforms
-   * 4. Render sprites
-   * 5. Schedule next frame
+   * 2. Update active zone
+   * 3. Clear previous frame
+   * 4. Update projection uniforms
+   * 5. Render current zone
+   * 6. Schedule next frame
    */
   private loop(): void {
-    // MessageBus updating
+    // Update message system
     MessageBus.update(0);
+
+    // Update active zone
+    ZoneManager.update(0);
 
     // Clear the color buffer to remove previous frame
     gl.clear(gl.COLOR_BUFFER_BIT);
 
+    // Set projection matrix uniform before rendering
     let projectionPosition =
       this._basicShader.getUniformLocation("u_projection");
 
@@ -145,8 +146,8 @@ export class KoruTSEngine {
       new Float32Array(this._projection.data)
     );
 
-    // Draw Sprite
-    this._sprite.draw(this._basicShader);
+    // Render active zone
+    ZoneManager.render(this._basicShader);
 
     // Schedule next frame using requestAnimationFrame
     // bind(this) ensures correct 'this' context in the callback

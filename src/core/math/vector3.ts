@@ -59,6 +59,14 @@ export class Vector3 {
     this._z = value;
   }
 
+  public static get zero(): Vector3 {
+    return new Vector3();
+  }
+
+  public static get one(): Vector3 {
+    return new Vector3(1, 1, 1);
+  }
+
   /**
    * Converts vector to array format
    * Faster than accessing individual components through getters
@@ -77,5 +85,11 @@ export class Vector3 {
    */
   public toFloat32Array(): Float32Array {
     return new Float32Array(this.toArray());
+  }
+
+  public copyFrom(vector: Vector3): void {
+    this._x = vector._x;
+    this._y = vector._y;
+    this._z = vector._z;
   }
 }

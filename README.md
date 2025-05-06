@@ -651,7 +651,7 @@ This PR implements texture loading and management with reference counting:
    - Implemented texture unit management
    - Added texture uniform support in shaders
 
-### [PR:5 Material System Implementation](https://github.com/Cyrus-0101/koru-ts/pull/4)
+### [PR:5 Material System Implementation](https://github.com/Cyrus-0101/koru-ts/pull/5)
 
 This PR implements a complete material system with color tinting and texture management:
 
@@ -718,6 +718,70 @@ This PR implements a complete material system with color tinting and texture man
    // Material cleanup
    MaterialManager.releaseMaterial("crate");  // Decrements reference
    ```
+### [PR:6 Architecture & Hierachy](https://github.com/Cyrus-0101/koru-ts/pull/6)
+
+This PR implements a robust scene graph and component system for game object management:
+
+1. **Scene Graph Implementation**
+   - Added hierarchical object relationships
+   - Implemented parent-child transformations
+   - Added scene management system
+
+   ```typescript
+   // Create parent-child relationship
+   const parent = new SimObject(1, "parent");
+   const child = new SimObject(2, "child");
+   parent.addChild(child);
+   
+   // Child inherits parent's transformations
+   parent.transform.rotation.z = Math.PI / 4;  // 45 degrees
+   ```
+
+2. **Component System**
+   - Implemented component-based architecture
+   - Added base component class
+   - Created sprite component
+
+   ```typescript
+   // Add sprite component to object
+   const player = new SimObject(1, "player");
+   const spriteComponent = new SpriteComponent("render", "playerTexture");
+   player.addComponent(spriteComponent);
+   ```
+
+3. **Zone Management**
+   - Added Zone class for level management
+   - Implemented ZoneManager singleton
+   - Added zone state machine
+   
+   ```typescript
+   // Create and switch to new zone
+   const levelId = ZoneManager.createZone("Level1", "First Level");
+   ZoneManager.changeZone(levelId);
+   ```
+
+4. **Transform System**
+   - Implemented local and world space transforms
+   - Added matrix hierarchy calculations
+   - Created transform component
+   
+   ```typescript
+   // Transform operations
+   gameObject.transform.position.x = 100;
+   gameObject.transform.rotation.z = Math.PI / 2;
+   gameObject.transform.scale.x = 2;
+   ```
+
+5. **Resource Management**
+   - Added scene-level resource tracking
+   - Implemented component lifecycle management
+   - Added hierarchy-based loading system
+   
+   ```typescript
+   // Resources load through hierarchy
+   scene.load();  // Loads all objects and components
+   ```
+
 
 ## Next Steps
 
@@ -726,7 +790,7 @@ This PR implements a complete material system with color tinting and texture man
 - [x] Add basic 2D sprite rendering
 - [ ] Implement basic physics
 - [ ] Add input handling
-- [ ] Implement scene graph
+- [x] Implement scene graph
 - [x] Add asset loading system
 - [ ] Add texture atlasing
 - [ ] Implement sprite batching

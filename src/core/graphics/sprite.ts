@@ -43,9 +43,6 @@ export class Sprite {
   /** GPU vertex buffer containing positions and UVs */
   private _buffer!: GLBuffer;
 
-  /** Position in world space */
-  public position: Vector3 = new Vector3();
-
   /** Reference to material for rendering */
   private _material: Material | undefined;
 
@@ -205,14 +202,14 @@ export class Sprite {
    *
    * @param shader Shader to use for rendering
    */
-  public draw(shader: Shader): void {
+  public draw(shader: Shader, model: Matrix4x4): void {
     // Update model matrix with current position
     let modelLocation = shader.getUniformLocation("u_model");
     gl.uniformMatrix4fv(
       // Translate Z
       modelLocation,
       false,
-      new Float32Array(Matrix4x4.translation(this.position).data)
+      model.toFloat32Array()
     );
 
     // Set color tint (currently orange)
