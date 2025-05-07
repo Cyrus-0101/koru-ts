@@ -1,7 +1,7 @@
 {
-    "name": "TestZone",
-    "description": "A simple zone for testing the development environment",
-    "id": 0,
+	"name": "TestZone",
+	"description": "A simple zone for testing the development environment",
+	"id": 0,
 	"objects": [
 		{
 			"name": "parentObject",
