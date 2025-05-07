@@ -1,40 +1,24 @@
 import { AssetManager } from "./assets/assetManager";
+import { ComponentManager } from "./assets/components/componentManager";
+import { SpriteComponentBuilder } from "./assets/components/spriteComponent";
 import { gl, GLUtilities } from "./gl/gl";
-import { AttributeInfo, GLBuffer } from "./gl/glBuffer";
-import { Shader } from "./gl/shaders";
 import { BasicShader } from "./gl/shaders/basicShader";
 import { Color } from "./graphics/color";
 import { Material } from "./graphics/material";
 import { MaterialManager } from "./graphics/materialManager";
-import { Sprite } from "./graphics/sprite";
 import { Matrix4x4 } from "./math/matrix4x4";
 import { MessageBus } from "./message/messageBus";
-import { fragmentShaderSource } from "./shaders/basic.frag";
-import { vertexShaderSource } from "./shaders/basic.vert";
 import { ZoneManager } from "./world/zoneManager";
 
 /**
- * KoruTSEngine - Core Game Engine Class
+ * Core game engine class implementing the main game loop and systems management
  *
  * Responsibilities:
- * - Game loop management and frame timing
- * - WebGL context and canvas management
- * - Asset and material management
- * - Sprite rendering pipeline
- * - Window resize handling
- *
- * Architecture:
- * - Uses MessageBus for component communication
- * - Implements projection matrix for 2D rendering
- * - Manages material and texture resources
- * - Handles shader uniform updates
- *
- * Performance:
- * - Uses requestAnimationFrame for optimal timing
- * - Caches uniform locations
- * - Updates projection only on resize
- * - Manages frame synchronization
- * - Efficient sprite rendering
+ * - Initialization and management of all engine subsystems
+ * - Game loop execution and timing
+ * - Resource management and loading
+ * - Rendering pipeline setup
+ * - Window and input handling
  */
 export class KoruTSEngine {
   /** Counter for tracking frame updates and performance monitoring */
@@ -74,7 +58,14 @@ export class KoruTSEngine {
     // Initialize WebGL context and get canvas reference
     this._canvas = GLUtilities.initialize();
 
-    AssetManager.initiliaze();
+    // Initialize AssetManager
+    AssetManager.initialize();
+
+    // Initialize ZoneManager
+    ZoneManager.initialize();
+
+    // Register Builders
+    ComponentManager.registerBuilder(new SpriteComponentBuilder());
 
     // Set default background color to black (R=0, G=0, B=0, A=1)
     gl.clearColor(0, 0, 0, 1);
@@ -92,9 +83,6 @@ export class KoruTSEngine {
       )
     );
 
-    // Create a zone
-    let zoneID = ZoneManager.createTestZone();
-
     // Configure orthographic projection for 2D rendering
     this._projection = Matrix4x4.orthographic(
       0,
@@ -105,7 +93,8 @@ export class KoruTSEngine {
       100.0
     );
 
-    ZoneManager.changeZone(zoneID);
+    // TEMPORARY: TO-DO: Change this to read from a game config later
+    ZoneManager.changeZone(0);
 
     // Configure initial viewport and canvas size
     this.resize();
@@ -136,6 +125,9 @@ export class KoruTSEngine {
     // Clear the color buffer to remove previous frame
     gl.clear(gl.COLOR_BUFFER_BIT);
 
+    // Render active zone
+    ZoneManager.render(this._basicShader);
+
     // Set projection matrix uniform before rendering
     let projectionPosition =
       this._basicShader.getUniformLocation("u_projection");
@@ -145,9 +137,6 @@ export class KoruTSEngine {
       false,
       new Float32Array(this._projection.data)
     );
-
-    // Render active zone
-    ZoneManager.render(this._basicShader);
 
     // Schedule next frame using requestAnimationFrame
     // bind(this) ensures correct 'this' context in the callback

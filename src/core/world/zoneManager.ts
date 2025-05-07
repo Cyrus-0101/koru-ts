@@ -1,114 +1,157 @@
+import {
+  AssetManager,
+  MESSAGE_ASSET_LOADER_ASSET_LOADED,
+} from "../assets/assetManager";
+import type { JsonAsset } from "../assets/jsonAssetLoader";
 import type { Shader } from "../gl/shaders";
-import { TestZone } from "./TestZone";
+import type { IMessageHandler } from "../message/IMessageHandler";
+import { Message } from "../message/message";
 import { Zone } from "./zone";
 
 /**
- * ZoneManager - Singleton manager for game zones/levels
+ * ZoneManager - Central controller for game zones/levels
  *
- * Features:
- * - Zone creation and management
- * - Unique zone ID generation
- * - Single active zone tracking
- * - Zone state management
+ * Implements the singleton pattern to manage:
+ * - Zone lifecycle (loading, activation, unloading)
  * - Zone transitions
+ * - Active zone state
+ * - Zone resource management
  *
- * Usage:
- * ```typescript
- * // Create and change to new zone
- * const forestId = ZoneManager.createZone("Forest", "A dense forest area");
- * ZoneManager.changeZone(forestId);
+ * @implements IMessageHandler For handling asset load notifications
  *
- * // Update and render active zone
- * ZoneManager.update(time);
- * ZoneManager.render(shader);
- * ```
+ * @example
+ * // Initialize the manager
+ * ZoneManager.initialize();
+ *
+ * // Load and activate a zone
+ * ZoneManager.changeZone(1);
+ *
+ * // In game loop:
+ * ZoneManager.update(deltaTime);
+ * ZoneManager.render(mainShader);
  */
-export class ZoneManager {
-  /** Global counter for generating unique zone IDs */
+export class ZoneManager implements IMessageHandler {
+  /** Next available zone ID counter */
   private static _globalZoneID: number = -1;
 
-  /** Map of zone IDs to zone instances */
-  private static _zones: { [id: number]: Zone } = {};
+  /** Registry of zone IDs to their asset paths */
+  private static _registeredZones: { [id: number]: string } = {};
 
-  /** Currently active zone */
+  /** Currently active zone instance */
   private static _activeZone: Zone | undefined;
 
-  /** Prevents instantiation - all methods are static */
-  private constructor() {}
+  /** Singleton instance for message handling */
+  private static _inst: ZoneManager;
+
+  private constructor() {} // Enforce singleton pattern
 
   /**
-   * Creates a new zone and assigns unique ID
-   * @param name Display name for the zone
-   * @param description Zone description text
-   * @returns Assigned zone ID for future reference
+   * Initializes the ZoneManager system
+   * - Creates singleton instance
+   * - Registers default test zone
    */
-  public static createZone(name: string, description: string): number {
-    ZoneManager._globalZoneID++;
+  public static initialize(): void {
+    ZoneManager._inst = new ZoneManager();
 
-    let zone = new Zone(ZoneManager._globalZoneID, name, description);
-
-    ZoneManager._zones[ZoneManager._globalZoneID] = zone;
-
-    return ZoneManager._globalZoneID;
-  }
-
-  // TO-DO: Temporary class until file loading is supported
-  public static createTestZone(): number {
-    ZoneManager._globalZoneID++;
-
-    let zone = new TestZone(
-      ZoneManager._globalZoneID,
-      "test",
-      "A simple test zone"
-    );
-
-    ZoneManager._zones[ZoneManager._globalZoneID] = zone;
-
-    return ZoneManager._globalZoneID;
+    // TEMPORARY
+    ZoneManager._registeredZones[0] = "assets/zones/testZone.json"; // Default test zone
   }
 
   /**
-   * Changes active zone with proper lifecycle handling
-   * - Deactivates current zone if one exists
-   * - Activates new zone if found
-   * - Maintains undefined if zone not found
+   * Transitions to a new active zone
+   * - Handles cleanup of current zone
+   * - Loads new zone assets if needed
+   * - Manages zone activation lifecycle
    *
-   * @param id ID of zone to activate
+   * @param id The ID of the zone to activate
+   * @throws Error if zone ID doesn't exist
    */
   public static changeZone(id: number): void {
-    if (ZoneManager._activeZone !== undefined) {
+    // Clean up current zone
+    if (ZoneManager._activeZone) {
       ZoneManager._activeZone.onDeactivated();
       ZoneManager._activeZone.unLoad();
+      ZoneManager._activeZone = undefined;
     }
 
-    if (ZoneManager._zones[id] !== undefined) {
-      ZoneManager._activeZone = ZoneManager._zones[id];
-      ZoneManager._activeZone.onActivated();
-      ZoneManager._activeZone.load();
+    // Validate and load new zone
+    const zoneAssetPath = ZoneManager._registeredZones[id];
+    if (!zoneAssetPath) {
+      throw new Error(`ERROR: Zone ID '${id}' not registered`);
+    }
+
+    if (AssetManager.isAssetLoaded(zoneAssetPath)) {
+      ZoneManager.loadZone(AssetManager.getAsset(zoneAssetPath)!);
+    } else {
+      Message.subscribe(
+        `${MESSAGE_ASSET_LOADER_ASSET_LOADED}${zoneAssetPath}`,
+        ZoneManager._inst
+      );
+      AssetManager.loadAsset(zoneAssetPath);
     }
   }
 
   /**
-   * Updates currently active zone if one exists
-   * Called each frame during game loop
-   *
-   * @param time Current engine time in milliseconds
+   * Updates the active zone's game state
+   * @param time Delta time in milliseconds since last update
    */
   public static update(time: number): void {
-    if (ZoneManager._activeZone !== undefined) {
-      ZoneManager._activeZone.update(time);
+    ZoneManager._activeZone?.update(time);
+  }
+
+  /**
+   * Renders the active zone
+   * @param shader The shader program to use for rendering
+   */
+  public static render(shader: Shader): void {
+    ZoneManager._activeZone?.render(shader);
+  }
+
+  /**
+   * Handles asset load completion messages
+   * @param message The incoming message with load data
+   */
+  public onMessage(message: Message): void {
+    if (message.code.includes(MESSAGE_ASSET_LOADER_ASSET_LOADED)) {
+      ZoneManager.loadZone(message.context as JsonAsset);
     }
   }
 
   /**
-   * Renders currently active zone if one exists
-   * Called each frame after update
-   *
-   * @param shader Shader to use for rendering pass
+   * Instantiates and activates a zone from loaded asset data
+   * @param asset The JSON asset containing zone configuration
+   * @throws Error if required zone data is missing
    */
-  public static render(shader: Shader): void {
-    if (ZoneManager._activeZone !== undefined) {
-      ZoneManager._activeZone.render(shader);
-    }
+  private static loadZone(asset: JsonAsset): void {
+    const { id, name, description } = this.validateZoneData(asset.data);
+
+    ZoneManager._activeZone = new Zone(id, name, description ?? "");
+    ZoneManager._activeZone.initialize(asset.data);
+    ZoneManager._activeZone.onActivated();
+    ZoneManager._activeZone.load();
+  }
+
+  /**
+   * Validates and extracts required zone data from JSON
+   * @param zoneData The raw zone configuration data
+   * @returns Validated zone parameters
+   * @throws Error if required fields are missing
+   */
+  private static validateZoneData(zoneData: any): {
+    id: number;
+    name: string;
+    description?: string;
+  } {
+    if (zoneData.id === undefined) throw new Error("ERROR: Missing zone ID");
+    if (zoneData.name === undefined)
+      throw new Error("ERROR: Missing zone name");
+
+    return {
+      id: Number(zoneData.id),
+      name: String(zoneData.name),
+      description: zoneData.description
+        ? String(zoneData.description)
+        : undefined,
+    };
   }
 }

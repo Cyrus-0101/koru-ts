@@ -1,4 +1,4 @@
-import type { BaseComponent } from "../assets/components/baseComponent";
+import type { IComponent } from "../assets/components/IComponent";
 import type { Shader } from "../gl/shaders";
 import { Matrix4x4 } from "../math/matrix4x4";
 import { Transform } from "../math/transform";
@@ -38,7 +38,7 @@ export class SimObject {
   private _scene: Scene | undefined;
 
   /** List of attached components */
-  private _components: BaseComponent[] = [];
+  private _components: IComponent[] = [];
 
   /** Local space transformation matrix */
   private _localMatrix: Matrix4x4 = Matrix4x4.identity();
@@ -138,7 +138,7 @@ export class SimObject {
    * Sets up component owner reference
    * @param component Component to attach
    */
-  public addComponent(component: BaseComponent): void {
+  public addComponent(component: IComponent): void {
     this._components.push(component);
     component.setOwner(this);
   }

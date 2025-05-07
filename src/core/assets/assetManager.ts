@@ -2,6 +2,7 @@ import { Message } from "../message/message";
 import type { IAsset } from "./IAsset";
 import type { IAssetLoader } from "./IAssetLoader";
 import { ImageAssetLoader } from "./imageAssetLoader";
+import { JsonAssetLoader } from "./jsonAssetLoader";
 
 export const MESSAGE_ASSET_LOADER_ASSET_LOADED =
   "MESSAGE_ASSET_LOADER_ASSET_LOADED::";
@@ -17,6 +18,19 @@ export const MESSAGE_ASSET_LOADER_ASSET_LOADED =
  *
  * Design Pattern: Singleton
  * All methods are static to ensure single point of asset management
+ *
+ * Usage:
+ * ```typescript
+ * // Initialize system
+ * AssetManager.initialize();
+ *
+ * // Load assets
+ * AssetManager.loadAsset("player.png");
+ * AssetManager.loadAsset("config.json");
+ *
+ * // Get loaded assets
+ * const playerTexture = AssetManager.getAsset("player.png");
+ * ```
  */
 export class AssetManager {
   /** Registered asset loaders by type */
@@ -28,8 +42,13 @@ export class AssetManager {
   /** Private constructor prevents instantiation */
   private constructor() {}
 
-  public static initiliaze(): void {
+  /**
+   * Initializes asset management system
+   * Registers default loaders for common asset types
+   */
+  public static initialize(): void {
     AssetManager._loaders.push(new ImageAssetLoader());
+    AssetManager._loaders.push(new JsonAssetLoader());
   }
 
   /**

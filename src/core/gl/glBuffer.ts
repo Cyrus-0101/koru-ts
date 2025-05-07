@@ -100,7 +100,9 @@ export class GLBuffer {
         break;
 
       default:
-        throw new Error("Unrecognized data type: " + dataType.toString());
+        throw new Error(
+          "ERROR: Unrecognized data type: " + dataType.toString()
+        );
     }
 
     this._stride = this._elementSize * this._typeSize;
@@ -215,7 +217,7 @@ export class GLBuffer {
         break;
 
       default:
-        throw new Error(`Unsupported data type: ${this._dataType}`);
+        throw new Error(`ERROR: Unsupported data type: ${this._dataType}`);
     }
 
     gl.bufferData(this._targetBufferType, bufferData, gl.STATIC_DRAW);

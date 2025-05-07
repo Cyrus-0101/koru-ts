@@ -1,5 +1,7 @@
 import type { Shader } from "../../gl/shaders";
 import type { SimObject } from "../../world/simObject";
+import type { IComponent } from "./IComponent";
+import type { IComponentData } from "./IComponentData";
 
 /**
  * BaseComponent - Abstract base class for all game object components
@@ -19,18 +21,23 @@ import type { SimObject } from "../../world/simObject";
  * }
  * ```
  */
-export abstract class BaseComponent {
+export abstract class BaseComponent implements IComponent {
   /** Reference to owning SimObject */
   protected _owner!: SimObject;
 
   /** Unique identifier for this component type */
-  public name!: string;
+  public name: string;
+
+  protected _data: IComponentData;
 
   /**
    * Creates new component
    * @param name Unique identifier for this component
    */
-  public constructor(name: string) {}
+  public constructor(data: IComponentData) {
+    this._data = data;
+    this.name = data.name;
+  }
 
   /**
    * Sets owning object reference

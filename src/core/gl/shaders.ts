@@ -63,7 +63,7 @@ export abstract class Shader {
   public getAttributeLocation(name: string): number {
     if (this._attributes[name] === undefined) {
       throw new Error(
-        `Unable to find attribute named '${name}' in shader '${this._name}'`
+        `ERROR: Unable to find attribute named '${name}' in shader '${this._name}'`
       );
     }
 
@@ -78,7 +78,7 @@ export abstract class Shader {
   public getUniformLocation(name: string): WebGLUniformLocation | null {
     if (this._uniforms[name] === undefined) {
       throw new Error(
-        `Unable to find uniform named '${name}' in shader '${this._name}'`
+        `ERROR: Unable to find uniform named '${name}' in shader '${this._name}'`
       );
     }
     return this._uniforms[name];
@@ -114,7 +114,7 @@ export abstract class Shader {
     // Create a new shader object
     let shader = gl.createShader(shaderType);
     if (!shader) {
-      throw new Error("Unable to create shader");
+      throw new Error("ERROR: Unable to create shader");
     }
 
     // Set the shader source code and compile it
@@ -124,7 +124,9 @@ export abstract class Shader {
     // Check for compilation errors
     let error = gl.getShaderInfoLog(shader);
     if (error !== "") {
-      throw new Error("Error compiling shader: " + this._name + ": " + error);
+      throw new Error(
+        "ERROR: Error compiling shader: " + this._name + ": " + error
+      );
     }
 
     return shader;
@@ -153,7 +155,9 @@ export abstract class Shader {
     // Check for linking errors
     let error = gl.getProgramInfoLog(this._program);
     if (error !== "") {
-      throw new Error("Error linking shader: " + this._name + ": " + error);
+      throw new Error(
+        "ERROR: Error linking shader: " + this._name + ": " + error
+      );
     }
   }
 

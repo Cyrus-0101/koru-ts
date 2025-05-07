@@ -58,4 +58,22 @@ export class Transform {
     // Order matters: (T * R) * S
     return Matrix4x4.multiply(Matrix4x4.multiply(translation, rotation), scale);
   }
+
+  /**
+   * Sets matrix values from a JSON object
+   * @param json Object containing position/rotation/scale number values
+   */
+  public setFromJson(json: any): void {
+    if (json.position !== undefined) {
+      this.position.setFromJson(json.position);
+    }
+
+    if (json.rotation !== undefined) {
+      this.rotation.setFromJson(json.rotation);
+    }
+
+    if (json.scale !== undefined) {
+      this.scale.setFromJson(json.scale);
+    }
+  }
 }

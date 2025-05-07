@@ -19,7 +19,9 @@ export class GLUtilities {
       canvas = document.getElementById(elementId) as HTMLCanvasElement;
 
       if (canvas === undefined) {
-        throw new Error("Cannot find a canvas element named: " + elementId);
+        throw new Error(
+          "ERROR: Cannot find a canvas element named: " + elementId
+        );
       }
     } else {
       canvas = document.createElement("canvas") as HTMLCanvasElement;
@@ -30,7 +32,7 @@ export class GLUtilities {
     const context = canvas.getContext("webgl");
 
     if (context === null) {
-      throw new Error("Unable to initialize WebGL!");
+      throw new Error("ERROR: Unable to initialize WebGL!");
     }
 
     gl = context;
