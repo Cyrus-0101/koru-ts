@@ -1,6 +1,62 @@
 import type { Shader } from "../../gl/shaders";
 import { Sprite } from "../../graphics/sprite";
 import { BaseComponent } from "./baseComponent";
+import { ComponentManager } from "./componentManager";
+import type { IComponent } from "./IComponent";
+import type { IComponentBuilder } from "./IComponentBuilder";
+import type { IComponentData } from "./IComponentData";
+
+/**
+ * Component data for sprite configuration
+ * Stores sprite properties loaded from JSON
+ *
+ * Properties:
+ * - name: Sprite identifier
+ * - materialName: Associated material name
+ */
+export class SpriteComponentData implements IComponentData {
+  public name!: string;
+  public materialName!: string;
+
+  public setFromJson(json: any): void {
+    if (json.name !== undefined) {
+      this.name = String(json.name);
+    }
+
+    if (json.materialName !== undefined) {
+      this.materialName = String(json.materialName);
+    }
+  }
+}
+
+/**
+ * Builder for creating sprite components from JSON data
+ * Handles deserialization of sprite configuration
+ *
+ * @implements {IComponentBuilder}
+ *
+ * @example
+ * const builder = new SpriteComponentBuilder();
+ * const sprite = builder.buildFromJson({
+ *   name: "player",
+ *   materialName: "playerMaterial"
+ * });
+ */
+export class SpriteComponentBuilder implements IComponentBuilder {
+  // Type that builder handles
+  // Taking a section of data and constructing the component using the data
+  public get type(): string {
+    return "sprite";
+  }
+
+  public buildFromJson(json: any): IComponent {
+    let data = new SpriteComponentData();
+
+    data.setFromJson(json);
+
+    return new Spritecomponent(data);
+  }
+}
 
 /**
  * SpriteComponent - Handles sprite rendering for game objects
@@ -26,10 +82,10 @@ export class Spritecomponent extends BaseComponent {
    * @param name Component identifier
    * @param materialName Name of material to use for sprite
    */
-  public constructor(name: string, materialName: string) {
-    super(name);
+  public constructor(data: SpriteComponentData) {
+    super(data);
 
-    this._sprite = new Sprite(name, materialName);
+    this._sprite = new Sprite(data.name, data.materialName);
   }
 
   /**
