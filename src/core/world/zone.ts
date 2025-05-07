@@ -1,5 +1,7 @@
 import type { Shader } from "../gl/shaders";
 import { Scene } from "./scene";
+import { SimObject } from "./simObject";
+import { ZoneManager } from "./zoneManager";
 
 export enum ZoneState {
   /** Initial state before load */
@@ -45,6 +47,8 @@ export class Zone {
   /**State Machine */
   private _state: ZoneState = ZoneState.UNINITIALIZED;
 
+  private _globalID: number = -1;
+
   /**
    * Creates a new game zone
    * @param id Unique identifier
@@ -76,6 +80,37 @@ export class Zone {
   /** Gets zone's scene graph */
   public get scene(): Scene {
     return this._scene;
+  }
+
+  /**
+   * Initializes zone from JSON data
+   * Creates scene hierarchy and objects from serialized data
+   * Must be called before zone can be loaded
+   *
+   * @param zoneData JSON data containing zone configuration
+   * @throws Error if required 'objects' property is missing
+   *
+   * @example
+   * zone.initialize({
+   *   objects: [
+   *     {
+   *       name: "Root",
+   *       transform: { x: 0, y: 0, z: 0 },
+   *       children: []
+   *     }
+   *   ]
+   * });
+   */
+  public initialize(zoneData: any): void {
+    if (zoneData.objects === undefined) {
+      throw new Error("Zone initialization error: 'objects' not present");
+    }
+
+    for (let o in zoneData.objects) {
+      let obj = zoneData.objects[0];
+
+      this.loadSimObject(SimObject, this._scene.root);
+    }
   }
 
   /**
@@ -131,4 +166,49 @@ export class Zone {
    * Cleanup resources and state
    */
   public onDeactivated(): void {}
+
+  /**
+   * Recursively loads SimObject and its children from JSON data
+   * @param dataSection JSON data containing object properties and children
+   * @param parent Parent SimObject to attach to
+   *
+   * Properties loaded:
+   * - name: Object name
+   * - transform: Position/rotation/scale
+   * - children: Child objects
+   *
+   * @example
+   * this.loadSimObject({
+   *   name: "Player",
+   *   transform: { x: 0, y: 0, z: 0 },
+   *   children: []
+   * }, parentObject);
+   */
+  private loadSimObject(dataSection: any, parent: SimObject): void {
+    let name: string;
+
+    if (dataSection.name !== undefined) {
+      name = String(dataSection.name);
+    } else {
+      name = "";
+    }
+
+    this._globalID++;
+    let simObject = new SimObject(this._globalID, name, this._scene);
+
+    if (dataSection.children !== undefined) {
+      simObject.transform.setFromJson(dataSection.transform);
+    }
+
+    if (dataSection.children !== undefined) {
+      for (let o in dataSection.children) {
+        let obj = dataSection.children[0];
+        this.loadSimObject(obj, simObject);
+      }
+    }
+
+    if (parent !== undefined) {
+      parent.addChild(simObject);
+    }
+  }
 }
