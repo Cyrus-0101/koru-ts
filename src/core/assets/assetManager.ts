@@ -46,7 +46,7 @@ export class AssetManager {
    * Initializes asset management system
    * Registers default loaders for common asset types
    */
-  public static initiliaze(): void {
+  public static initialize(): void {
     AssetManager._loaders.push(new ImageAssetLoader());
     AssetManager._loaders.push(new JsonAssetLoader());
   }
