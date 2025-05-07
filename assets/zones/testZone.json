@@ -2,26 +2,40 @@
     "name": "TestZone",
     "description": "A simple zone for testing the development environment",
     "id": 0,
-    "objects": [
-        {
-            "name": "parentObject",
-            "transform": {
-                "position": {
-                    "x": 300,
-                    "y": 300
-                }
-            },
-            "children": [
-                {
-                    "name": "testObject",
-                    "transform": {
-                        "position": {
-                            "x": 120,
-                            "y": 120
-                        }
-                    }
-                }
-            ]
-        }
-    ]
+	"objects": [
+		{
+			"name": "parentObject",
+			"transform": {
+				"position": {
+					"x": 300,
+					"y": 300
+				}
+			},
+			"children": [
+				{
+					"name": "testObject",
+					"transform": {
+						"position": {
+							"x": 120,
+							"y": 120
+						}
+					},
+					"components": [
+						{
+							"name": "test",
+							"type": "sprite",
+							"materialName": "crate"
+						}
+					]
+				}
+			],
+			"components": [
+				{
+					"name": "test",
+					"type": "sprite",
+					"materialName": "crate"
+				}
+			]
+		}
+	]
 }
