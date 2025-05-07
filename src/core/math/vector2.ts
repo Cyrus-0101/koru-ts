@@ -64,4 +64,20 @@ export class Vector2 {
   public toFloat32Array(): Float32Array {
     return new Float32Array(this.toArray());
   }
+
+  /**
+   * Sets vector components from a JSON object
+   * @param json Object containing x, y number values
+   * @example
+   * vector.setFromJson({ x: 1, y: 2 })
+   */
+  public setFromJson(json: any): void {
+    if (json.x !== undefined) {
+      this._x = Number(json.x);
+    }
+
+    if (json.y !== undefined) {
+      this._y = Number(json.y);
+    }
+  }
 }
