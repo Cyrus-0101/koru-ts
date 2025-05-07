@@ -1,7 +1,7 @@
+import { ComponentManager } from "../assets/components/componentManager";
 import type { Shader } from "../gl/shaders";
 import { Scene } from "./scene";
 import { SimObject } from "./simObject";
-import { ZoneManager } from "./zoneManager";
 
 export enum ZoneState {
   /** Initial state before load */
@@ -103,13 +103,15 @@ export class Zone {
    */
   public initialize(zoneData: any): void {
     if (zoneData.objects === undefined) {
-      throw new Error("Zone initialization error: 'objects' not present");
+      throw new Error(
+        "ERROR: Zone initialization error: 'objects' not present"
+      );
     }
 
-    for (let o in zoneData.objects) {
-      let obj = zoneData.objects[0];
+    for (let ob in zoneData.objects) {
+      let obj = zoneData.objects[ob];
 
-      this.loadSimObject(SimObject, this._scene.root);
+      this.loadSimObject(obj, this._scene.root);
     }
   }
 
@@ -185,29 +187,43 @@ export class Zone {
    * }, parentObject);
    */
   private loadSimObject(dataSection: any, parent: SimObject): void {
-    let name: string;
+    let name!: string;
 
     if (dataSection.name !== undefined) {
       name = String(dataSection.name);
-    } else {
-      name = "";
     }
 
     this._globalID++;
+
+    // 1. Create new node (SimObject)
     let simObject = new SimObject(this._globalID, name, this._scene);
 
-    if (dataSection.children !== undefined) {
+    // 2. Process node properties (transform, components)
+    if (dataSection.transform !== undefined) {
       simObject.transform.setFromJson(dataSection.transform);
     }
 
+    if (dataSection.components !== undefined) {
+      // Process all components
+
+      for (let c in dataSection.components) {
+        let data = dataSection.components[c];
+        let component = ComponentManager.extractComponent(data)!;
+
+        simObject.addComponent(component);
+      }
+    }
+
+    // 3. Recursively process children (depth-first)
     if (dataSection.children !== undefined) {
-      for (let o in dataSection.children) {
-        let obj = dataSection.children[0];
+      for (let ob in dataSection.children) {
+        let obj = dataSection.children[ob];
         this.loadSimObject(obj, simObject);
       }
     }
 
     if (parent !== undefined) {
+      // 4. Attach to parent (completes the tree connection)
       parent.addChild(simObject);
     }
   }
