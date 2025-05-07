@@ -87,9 +87,35 @@ export class Vector3 {
     return new Float32Array(this.toArray());
   }
 
+  /**
+   * Copies components from another Vector3
+   * @param vector Source vector to copy values from
+   * @example
+   * vectorA.copyFrom(vectorB)
+   */
   public copyFrom(vector: Vector3): void {
     this._x = vector._x;
     this._y = vector._y;
     this._z = vector._z;
+  }
+
+  /**
+   * Sets vector components from a JSON object
+   * @param json Object containing x, y, z number values
+   * @example
+   * vector.setFromJson({ x: 1, y: 2, z: 3 })
+   */
+  public setFromJson(json: any): void {
+    if (json.x !== undefined) {
+      this._x = Number(json.x);
+    }
+
+    if (json.y !== undefined) {
+      this._y = Number(json.y);
+    }
+
+    if (json.z !== undefined) {
+      this._z = Number(json.z);
+    }
   }
 }
