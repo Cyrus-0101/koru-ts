@@ -74,7 +74,11 @@ export class KoruTSEngine {
     // Initialize WebGL context and get canvas reference
     this._canvas = GLUtilities.initialize();
 
+    // Initialize AssetManager
     AssetManager.initiliaze();
+
+    // Initialize ZoneManager
+    ZoneManager.initialize();
 
     // Set default background color to black (R=0, G=0, B=0, A=1)
     gl.clearColor(0, 0, 0, 1);
@@ -92,9 +96,6 @@ export class KoruTSEngine {
       )
     );
 
-    // Create a zone
-    let zoneID = ZoneManager.createTestZone();
-
     // Configure orthographic projection for 2D rendering
     this._projection = Matrix4x4.orthographic(
       0,
@@ -105,7 +106,8 @@ export class KoruTSEngine {
       100.0
     );
 
-    ZoneManager.changeZone(zoneID);
+    // TEMPORARY: TO-DO: Change this to read from a game config later
+    ZoneManager.changeZone(0);
 
     // Configure initial viewport and canvas size
     this.resize();
