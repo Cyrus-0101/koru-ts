@@ -788,6 +788,95 @@ This PR implements a robust scene graph and component system for game object man
    // Resources load through hierarchy
    scene.load();  // Loads all objects and components
    ```
+### [PR:7 Component System & JSON Serialization](https://github.com/Cyrus-0101/koru-ts/pull/7)
+
+This PR implements a robust component system with JSON serialization and zone management:
+
+1. **Core Component Architecture**
+   - Implemented `IComponent` interface for all game components
+   - Created `BaseComponent` abstract class with lifecycle methods
+   - Added component ownership tracking through `SimObject`
+   ```typescript
+   class HealthComponent extends BaseComponent {
+       public update(time: number): void {
+           // Custom update logic
+       }
+   }
+   ```
+
+2. **Component Factory System**
+   - Created `IComponentBuilder` interface for JSON deserialization
+   - Implemented `ComponentManager` singleton for builder registration
+   - Added type-safe component instantiation from JSON
+   ```typescript
+   // Register builder
+   ComponentManager.registerBuilder(new SpriteComponentBuilder());
+   
+   // Create from JSON
+   const component = ComponentManager.extractComponent({
+       type: "sprite",
+       material: "player"
+   });
+   ```
+
+3. **JSON Serialization System**
+   - Added `setFromJson` methods to core math classes (Vector2/3, Transform)
+   - Implemented `IComponentData` interface for serializable components
+   - Created JSON asset loader with error handling
+   ```typescript
+   // Vector3 deserialization
+   const vec = new Vector3();
+   vec.setFromJson({ x: 1, y: 2, z: 3 });
+   
+   // Transform deserialization
+   transform.setFromJson({
+       position: { x: 10, y: 5 },
+       rotation: { z: 45 }, // degrees
+       scale: { x: 2, y: 2 }
+   });
+   ```
+
+4. **Zone Management System**
+   - Implemented recursive `loadSimObject` for hierarchical scene loading
+   - Added zone state machine (UNINITIALIZED → LOADING → UPDATING)
+   - Created JSON-based zone initialization
+   ```typescript
+   // Zone JSON structure
+   {
+       "id": 1,
+       "name": "Forest",
+       "objects": [{
+           "name": "Player",
+           "components": [{
+               "type": "sprite",
+               "material": "player"
+           }]
+       }]
+   }
+   ```
+
+5. **Engine Integration**
+   - Connected `AssetManager` with `ZoneManager` for resource loading
+   - Implemented message-based zone transitions
+   - Added initialization to engine startup
+   ```typescript
+   // Engine startup sequence
+   start() {
+       AssetManager.initiliaze();
+       ZoneManager.initialize();
+       ComponentManager.registerBuilder(new SpriteComponentBuilder());
+       ZoneManager.changeZone(0); // Load first zone
+   }
+   ```
+
+Key Features:
+- Type-safe component creation from JSON
+- Recursive scene graph construction
+- Asynchronous zone loading
+- Clean separation between data and behavior
+- Comprehensive error handling
+
+> The system enables data-driven game object creation while maintaining type safety and providing clear lifecycle management.
 
 ## References
 
