@@ -247,12 +247,7 @@ export class SimObject {
       );
     } else {
       // Root object - world equals local
-      this.worldMatrix.copyFrom(this._localMatrix);
-    }
-
-    // Recursively update children
-    for (let child of this._children) {
-      child.updateWorldMatrix(this._worldMatrix);
+      this._worldMatrix.copyFrom(this._localMatrix);
     }
   }
 }
