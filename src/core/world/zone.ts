@@ -1,4 +1,5 @@
 import { ComponentManager } from "../assets/components/componentManager";
+import { BehaviourManager } from "../behaviours/behaviourManager";
 import type { Shader } from "../gl/shaders";
 import { Scene } from "./scene";
 import { SimObject } from "./simObject";
@@ -205,12 +206,21 @@ export class Zone {
 
     if (dataSection.components !== undefined) {
       // Process all components
-
       for (let c in dataSection.components) {
         let data = dataSection.components[c];
         let component = ComponentManager.extractComponent(data)!;
 
         simObject.addComponent(component);
+      }
+    }
+
+    if (dataSection.behaviours !== undefined) {
+      // Process all behaviours
+      for (let b in dataSection.behaviours) {
+        let data = dataSection.behaviours[b];
+        let behaviour = BehaviourManager.extractBehaviour(data)!;
+
+        simObject.addBehavour(behaviour);
       }
     }
 
