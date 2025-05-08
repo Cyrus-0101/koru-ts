@@ -878,6 +878,71 @@ Key Features:
 
 > The system enables data-driven game object creation while maintaining type safety and providing clear lifecycle management.
 
+
+### [PR:8 Behaviour System Implementation](https://github.com/Cyrus-0101/koru-ts/pull/8)
+
+This PR implements a flexible behaviour system with JSON serialization and management:
+
+1. **Core Behaviour Architecture**
+   - Implemented `IBehaviour` interface for all game behaviours
+   - Created `BaseBehaviour` abstract class with lifecycle methods
+   - Added behaviour ownership tracking through `SimObject`
+   ```typescript
+   class RotationBehaviour extends BaseBehaviour {
+       public update(time: number): void {
+           this._owner.transform.rotation.add(this._rotation);
+       }
+   }
+   ```
+
+2. **Behaviour Factory System**
+   - Created `IBehaviourBuilder` interface for JSON deserialization
+   - Implemented `BehaviourManager` singleton for builder registration
+   - Added type-safe behaviour instantiation from JSON
+   ```typescript
+   // Register builder
+   BehaviourManager.registerBuilder(new RotationBehaviourBuilder());
+   
+   // Create from JSON
+   const behaviour = BehaviourManager.extractBehaviour({
+       type: "rotation",
+       rotation: { x: 0, y: 1, z: 0 }
+   });
+   ```
+
+3. **JSON Serialization Integration**
+   - Added behaviour data classes implementing `IBehaviourData`
+   - Implemented `setFromJson` for behaviour configuration
+   - Created validation for required behaviour properties
+   ```typescript
+   // Behaviour data deserialization
+   const data = new RotationBehaviourData();
+   data.setFromJson({
+       name: "spin",
+       rotation: { x: 0, y: 2, z: 0 }
+   });
+   
+   // JSON behaviour definition
+   {
+       "type": "rotation",
+       "name": "coinSpin",
+       "rotation": { "y": 5 }
+   }
+   ```
+
+4. **Engine Integration**
+   - Connected `BehaviourManager` with core engine systems
+   - Implemented automatic builder registration
+   ```typescript
+   // Engine initialization
+   start() {
+      // ...existing code
+
+       BehaviourManager.registerBuilder(new RotationBehaviourBuilder());
+       // Additional system initialization
+   }
+   ```
+
 ## References
 
 - [TypeScript Documentation](https://www.typescriptlang.org/docs/)
