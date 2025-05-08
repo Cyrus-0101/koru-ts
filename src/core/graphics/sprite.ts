@@ -2,7 +2,6 @@ import { gl } from "../gl/gl";
 import { AttributeInfo, GLBuffer } from "../gl/glBuffer";
 import type { Shader } from "../gl/shaders";
 import { Matrix4x4 } from "../math/matrix4x4";
-import { Vector3 } from "../math/vector3";
 import { Material } from "./material";
 import { MaterialManager } from "./materialManager";
 
@@ -80,16 +79,13 @@ export class Sprite {
    */
   public load(): void {
     // Create a new buffer object in GPU memory with 3 components per vertex (x,y,z)
-    this._buffer = new GLBuffer(5);
+    this._buffer = new GLBuffer();
 
     // Configure vertex position attribute for the shader
     let positionAttribute = new AttributeInfo();
 
     // Get location of a_position attribute from shader program
     positionAttribute.location = 0;
-
-    // Set offset to 0 (start of vertex data)
-    positionAttribute.offset = 0;
 
     // Each position has 3 components (x, y, z)
     positionAttribute.size = 3;
@@ -100,8 +96,6 @@ export class Sprite {
     let texCoordAttributes = new AttributeInfo();
 
     texCoordAttributes.location = 1;
-
-    texCoordAttributes.offset = 3;
 
     // Each position has 3 components (U, V or x, y)
     texCoordAttributes.size = 2;

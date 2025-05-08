@@ -1,4 +1,5 @@
 import type { IComponent } from "../assets/components/IComponent";
+import type { IBehaviour } from "../behaviours/IBehaviour";
 import type { Shader } from "../gl/shaders";
 import { Matrix4x4 } from "../math/matrix4x4";
 import { Transform } from "../math/transform";
@@ -51,6 +52,8 @@ export class SimObject {
 
   /** Transform component for position/rotation/scale */
   public transform: Transform = new Transform();
+
+  private _behaviours: IBehaviour[] = [];
 
   /**
    * Creates a new simulation object
@@ -143,6 +146,11 @@ export class SimObject {
     component.setOwner(this);
   }
 
+  public addBehavour(behaviour: IBehaviour): void {
+    this._behaviours.push(behaviour);
+    behaviour.setOwner(this);
+  }
+
   /**
    * Loads object resources
    * - Loads all attached components
@@ -183,6 +191,11 @@ export class SimObject {
     // Update components
     for (let c of this._components) {
       c.update(time);
+    }
+
+    // Update components
+    for (let b of this._behaviours) {
+      b.update(time);
     }
 
     // Update children
@@ -247,12 +260,7 @@ export class SimObject {
       );
     } else {
       // Root object - world equals local
-      this.worldMatrix.copyFrom(this._localMatrix);
-    }
-
-    // Recursively update children
-    for (let child of this._children) {
-      child.updateWorldMatrix(this._worldMatrix);
+      this._worldMatrix.copyFrom(this._localMatrix);
     }
   }
 }

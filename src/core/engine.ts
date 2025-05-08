@@ -1,6 +1,8 @@
 import { AssetManager } from "./assets/assetManager";
 import { ComponentManager } from "./assets/components/componentManager";
 import { SpriteComponentBuilder } from "./assets/components/spriteComponent";
+import { BehaviourManager } from "./behaviours/behaviourManager";
+import { RotationBehaviourBuilder } from "./behaviours/rotationBehaviour";
 import { gl, GLUtilities } from "./gl/gl";
 import { BasicShader } from "./gl/shaders/basicShader";
 import { Color } from "./graphics/color";
@@ -67,6 +69,9 @@ export class KoruTSEngine {
     // Register Builders
     ComponentManager.registerBuilder(new SpriteComponentBuilder());
 
+    // Register Behaviours
+    BehaviourManager.registerBuilder(new RotationBehaviourBuilder());
+
     // Set default background color to black (R=0, G=0, B=0, A=1)
     gl.clearColor(0, 0, 0, 1);
 
@@ -76,11 +81,7 @@ export class KoruTSEngine {
 
     // Register default material with blue tint
     MaterialManager.registerMaterial(
-      new Material(
-        "crate",
-        "assets/textures/crate.jpg",
-        new Color(0, 128, 255, 255)
-      )
+      new Material("crate", "assets/textures/crate.jpg", Color.white())
     );
 
     // Configure orthographic projection for 2D rendering

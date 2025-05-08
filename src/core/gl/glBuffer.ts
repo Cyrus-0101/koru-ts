@@ -63,18 +63,16 @@ export class GLBuffer {
 
   /**
    * Creates a new GL buffer with specified configuration
-   * @param elementSize Size of each element in this buffer - Number of components per vertex (e.g., 3 for positions (x,y,z))
    * @param dataType Type of data (default=gl.FLOAT, gl.INT, etc.)
    * @param targetBufferType Buffer target type (default=gl.ARRAY_BUFFER or gl.ELEMENT_ARRAY_BUFFER)
    * @param mode Drawing mode of this buffer (default=gl.TRIANGLES or gl.LINES, etc.)
    */
   public constructor(
-    elementSize: number,
     dataType: number = gl.FLOAT,
     targetBufferType: number = gl.ARRAY_BUFFER,
     mode: number = gl.TRIANGLES
   ) {
-    this._elementSize = elementSize;
+    this._elementSize = 0;
     this._dataType = dataType;
     this._targetBufferType = targetBufferType;
     this._mode = mode;
@@ -105,7 +103,6 @@ export class GLBuffer {
         );
     }
 
-    this._stride = this._elementSize * this._typeSize;
     this._buffer = gl.createBuffer();
   }
 
@@ -166,7 +163,10 @@ export class GLBuffer {
    */
   public addAttributeLocation(info: AttributeInfo): void {
     this._hasAttributeLocation = true;
+    info.offset = this._elementSize;
     this._attributes.push(info);
+    this._elementSize += info.size;
+    this._stride = this._elementSize * this._typeSize;
   }
 
   /**

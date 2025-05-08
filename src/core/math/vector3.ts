@@ -118,4 +118,60 @@ export class Vector3 {
       this._z = Number(json.z);
     }
   }
+
+  /**
+   * Adds another vector to this one (component-wise)
+   * Modifies the current vector in place
+   * @param v Vector to add
+   * @returns This vector after addition
+   */
+  public add(v: Vector3): Vector3 {
+    this._x += v._x;
+    this._y += v._y;
+    this._z += v._z;
+
+    return this;
+  }
+
+  /**
+   * Subtracts another vector from this one (component-wise)
+   * Modifies the current vector in place
+   * @param v Vector to subtract
+   * @returns This vector after subtraction
+   */
+  public subtract(v: Vector3): Vector3 {
+    this._x -= v._x;
+    this._y -= v._y;
+    this._z -= v._z;
+
+    return this;
+  }
+
+  /**
+   * Multiplies this vector by another (component-wise)
+   * Modifies the current vector in place
+   * @param v Vector to multiply by
+   * @returns This vector after multiplication
+   */
+  public multiply(v: Vector3): Vector3 {
+    this._x *= v._x;
+    this._y *= v._y;
+    this._z *= v._z;
+
+    return this;
+  }
+
+  /**
+   * Divides this vector by another (component-wise)
+   * Modifies the current vector in place
+   * @param v Vector to divide by
+   * @returns This vector after division
+   */
+  public divide(v: Vector3): Vector3 {
+    this._x /= v._x;
+    this._y /= v._y;
+    this._z /= v._z;
+
+    return this;
+  }
 }
