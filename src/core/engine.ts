@@ -1,14 +1,19 @@
 import { AssetManager } from "./assets/assetManager";
+import { AnimatedSpriteComponentBuilder } from "./assets/components/animatedSpriteComponent";
 import { ComponentManager } from "./assets/components/componentManager";
 import { SpriteComponentBuilder } from "./assets/components/spriteComponent";
 import { BehaviourManager } from "./behaviours/behaviourManager";
+import { KeyboardMovementBehaviourBuilder } from "./behaviours/keyboardMovementBehaviour";
 import { RotationBehaviourBuilder } from "./behaviours/rotationBehaviour";
 import { gl, GLUtilities } from "./gl/gl";
 import { BasicShader } from "./gl/shaders/basicShader";
 import { Color } from "./graphics/color";
 import { Material } from "./graphics/material";
 import { MaterialManager } from "./graphics/materialManager";
+import { InputManager, MouseContext } from "./input/inputManager";
 import { Matrix4x4 } from "./math/matrix4x4";
+import type { IMessageHandler } from "./message/IMessageHandler";
+import { Message } from "./message/message";
 import { MessageBus } from "./message/messageBus";
 import { ZoneManager } from "./world/zoneManager";
 
@@ -22,7 +27,7 @@ import { ZoneManager } from "./world/zoneManager";
  * - Rendering pipeline setup
  * - Window and input handling
  */
-export class KoruTSEngine {
+export class KoruTSEngine implements IMessageHandler {
   /** Counter for tracking frame updates and performance monitoring */
   private _count: number = 0;
 
@@ -31,6 +36,8 @@ export class KoruTSEngine {
 
   /** Basic shader for 2D sprite rendering */
   private _basicShader!: BasicShader;
+
+  private _previousTime: number = 0;
 
   /**
    * Orthographic projection matrix
@@ -63,17 +70,28 @@ export class KoruTSEngine {
     // Initialize AssetManager
     AssetManager.initialize();
 
+    InputManager.initialize();
+
     // Initialize ZoneManager
     ZoneManager.initialize();
 
     // Register Builders
     ComponentManager.registerBuilder(new SpriteComponentBuilder());
+    ComponentManager.registerBuilder(new AnimatedSpriteComponentBuilder());
 
     // Register Behaviours
     BehaviourManager.registerBuilder(new RotationBehaviourBuilder());
+    BehaviourManager.registerBuilder(new KeyboardMovementBehaviourBuilder());
+
+    Message.subscribe("MOUSE_UP", this);
 
     // Set default background color to black (R=0, G=0, B=0, A=1)
-    gl.clearColor(0, 0, 0, 1);
+    gl.clearColor(0, 0, 0.3, 1);
+
+    // Make background blend - remove background
+    gl.enable(gl.BLEND);
+
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
     // Load and activate shader programs for rendering
     this._basicShader = new BasicShader();
@@ -82,6 +100,11 @@ export class KoruTSEngine {
     // Register default material with blue tint
     MaterialManager.registerMaterial(
       new Material("crate", "assets/textures/crate.jpg", Color.white())
+    );
+
+    // Register new material with blue tint
+    MaterialManager.registerMaterial(
+      new Material("duck", "assets/textures/duck.png", Color.white())
     );
 
     // Configure orthographic projection for 2D rendering
@@ -104,6 +127,13 @@ export class KoruTSEngine {
     this.loop();
   }
 
+  public onMessage(message: Message): void {
+    if (message.code === "MOUSE_UP") {
+      let context = message.context as MouseContext;
+      document.title = `Mouse Position: [${context.position.x}, ${context.position.y}]`;
+    }
+  }
+
   /**
    * Main game loop
    * Executes every frame (targeted 60fps)
@@ -117,12 +147,23 @@ export class KoruTSEngine {
    * 6. Schedule next frame
    */
   private loop(): void {
+    this.update();
+
+    this.render();
+  }
+
+  private update(): void {
+    let delta = performance.now() - this._previousTime;
     // Update message system
-    MessageBus.update(0);
+    MessageBus.update(delta);
 
     // Update active zone
-    ZoneManager.update(0);
+    ZoneManager.update(delta);
 
+    this._previousTime = performance.now();
+  }
+
+  private render(): void {
     // Clear the color buffer to remove previous frame
     gl.clear(gl.COLOR_BUFFER_BIT);
 

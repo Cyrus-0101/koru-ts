@@ -943,6 +943,93 @@ This PR implements a flexible behaviour system with JSON serialization and manag
    }
    ```
 
+### [PR:9 Animation & Input System Implementation](https://github.com/Cyrus-0101/koru-ts/pull/9)
+
+This PR implements a comprehensive animation and input management system with component-based architecture:
+
+1. **Animation System Core**
+
+   * Created `AnimatedSprite` class extending `Sprite` with frame-by-frame animation
+   * Implemented `IMessageHandler` for animation event communication
+   * Refactored `Sprite` class to use extensible `Vertex` type system
+
+```typescript
+class DuckAnimation extends AnimatedSprite {
+    public update(time: number): void {
+        this.playAnimation("quack");
+    }
+}
+```
+
+2. **Component Architecture**
+
+   * Built `AnimatedSpriteComponent` for entity animation management
+   * Developed `KeyboardMovementBehaviour` for input-driven motion
+   * Added `setData()` and `clearData()` methods for state management
+
+```typescript
+// Animation component registration
+ComponentManager.registerBuilder(new AnimatedSpriteComponentBuilder());
+
+// Movement behaviour from JSON
+const movement = BehaviourManager.extractBehaviour({
+    type: "keyboardMovement",
+    speed: 2.5
+});
+```
+
+3. **Input Management System**
+
+   * Implemented `InputManager` class for unified input handling
+   * Added keyboard and mouse event listeners
+   * Integrated input system with message bus
+
+```typescript
+// Input configuration
+InputManager.registerKeyMap({
+    "MoveUp": "KeyW",
+    "MoveLeft": "KeyA",
+    "MoveRight": "KeyD",
+    "MoveDown": "KeyS"
+});
+```
+
+4. **Engine Integration & Optimization**
+
+   * Added update/render helper methods to streamline game loop
+   * Implemented delta time handling in `MessageBus` and `ZoneManager`
+   * Added texture blending for transparent backgrounds
+
+```typescript
+// Engine initialization
+start() {
+    InputManager.initialize();
+    MessageBus.subscribe("MOUSE_CLICK", this);
+    
+    // Register animation builders
+    ComponentManager.registerBuilder(new AnimatedSpriteComponentBuilder());
+}
+```
+
+5. **Asset Pipeline**
+
+   * Added duck texture with transparent background
+   * Created dedicated material for animated sprites
+   * Implemented vertex-based rendering pipeline
+
+```json
+// Example animated sprite configuration
+{
+    "type": "animatedSprite",
+    "material": "duck",
+    "frameWidth": 64,
+    "frameHeight": 64,
+    "frameCount": 8,
+    "frameSequence": [0,1,2,3,4,5,6,7]
+}
+```
+
+
 ## References
 
 - [TypeScript Documentation](https://www.typescriptlang.org/docs/)

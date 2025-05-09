@@ -16,7 +16,7 @@ export class Vector2 {
   private _y: number;
 
   /**
-   * Creates a new Vector3
+   * Creates a new Vector2
    * @param x X component (default: 0)
    * @param y Y component (default: 0)
    */
@@ -45,6 +45,14 @@ export class Vector2 {
     this._y = value;
   }
 
+  public static get zero(): Vector2 {
+    return new Vector2();
+  }
+
+  public static get one(): Vector2 {
+    return new Vector2(1, 1);
+  }
+
   /**
    * Converts vector to array format
    * Faster than accessing individual components through getters
@@ -66,6 +74,17 @@ export class Vector2 {
   }
 
   /**
+   * Copies components from another Vector3
+   * @param vector Source vector to copy values from
+   * @example
+   * vectorA.copyFrom(vectorB)
+   */
+  public copyFrom(vector: Vector2): void {
+    this._x = vector._x;
+    this._y = vector._y;
+  }
+
+  /**
    * Sets vector components from a JSON object
    * @param json Object containing x, y number values
    * @example
@@ -79,5 +98,57 @@ export class Vector2 {
     if (json.y !== undefined) {
       this._y = Number(json.y);
     }
+  }
+
+  /**
+   * Adds another vector to this one (component-wise)
+   * Modifies the current vector in place
+   * @param v Vector to add
+   * @returns This vector after addition
+   */
+  public add(v: Vector2): Vector2 {
+    this._x += v._x;
+    this._y += v._y;
+
+    return this;
+  }
+
+  /**
+   * Subtracts another vector from this one (component-wise)
+   * Modifies the current vector in place
+   * @param v Vector to subtract
+   * @returns This vector after subtraction
+   */
+  public subtract(v: Vector2): Vector2 {
+    this._x -= v._x;
+    this._y -= v._y;
+
+    return this;
+  }
+
+  /**
+   * Multiplies this vector by another (component-wise)
+   * Modifies the current vector in place
+   * @param v Vector to multiply by
+   * @returns This vector after multiplication
+   */
+  public multiply(v: Vector2): Vector2 {
+    this._x *= v._x;
+    this._y *= v._y;
+
+    return this;
+  }
+
+  /**
+   * Divides this vector by another (component-wise)
+   * Modifies the current vector in place
+   * @param v Vector to divide by
+   * @returns This vector after division
+   */
+  public divide(v: Vector2): Vector2 {
+    this._x /= v._x;
+    this._y /= v._y;
+
+    return this;
   }
 }
