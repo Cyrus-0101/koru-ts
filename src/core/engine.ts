@@ -3,6 +3,7 @@ import { AnimatedSpriteComponentBuilder } from "./assets/components/animatedSpri
 import { ComponentManager } from "./assets/components/componentManager";
 import { SpriteComponentBuilder } from "./assets/components/spriteComponent";
 import { BehaviourManager } from "./behaviours/behaviourManager";
+import { KeyboardMovementBehaviourBuilder } from "./behaviours/keyboardMovementBehaviour";
 import { RotationBehaviourBuilder } from "./behaviours/rotationBehaviour";
 import { gl, GLUtilities } from "./gl/gl";
 import { BasicShader } from "./gl/shaders/basicShader";
@@ -11,6 +12,8 @@ import { Material } from "./graphics/material";
 import { MaterialManager } from "./graphics/materialManager";
 import { InputManager, MouseContext } from "./input/inputManager";
 import { Matrix4x4 } from "./math/matrix4x4";
+import type { IMessageHandler } from "./message/IMessageHandler";
+import { Message } from "./message/message";
 import { MessageBus } from "./message/messageBus";
 import { ZoneManager } from "./world/zoneManager";
 
@@ -24,7 +27,7 @@ import { ZoneManager } from "./world/zoneManager";
  * - Rendering pipeline setup
  * - Window and input handling
  */
-export class KoruTSEngine {
+export class KoruTSEngine implements IMessageHandler {
   /** Counter for tracking frame updates and performance monitoring */
   private _count: number = 0;
 
@@ -78,10 +81,14 @@ export class KoruTSEngine {
 
     // Register Behaviours
     BehaviourManager.registerBuilder(new RotationBehaviourBuilder());
+    BehaviourManager.registerBuilder(new KeyboardMovementBehaviourBuilder());
+
+    Message.subscribe("MOUSE_UP", this);
 
     // Set default background color to black (R=0, G=0, B=0, A=1)
     gl.clearColor(0, 0, 0.3, 1);
 
+    // Make background blend - remove background
     gl.enable(gl.BLEND);
 
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -118,6 +125,13 @@ export class KoruTSEngine {
 
     // Start the main game loop
     this.loop();
+  }
+
+  public onMessage(message: Message): void {
+    if (message.code === "MOUSE_UP") {
+      let context = message.context as MouseContext;
+      document.title = `Mouse Position: [${context.position.x}, ${context.position.y}]`;
+    }
   }
 
   /**
