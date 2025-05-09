@@ -170,6 +170,18 @@ export class GLBuffer {
   }
 
   /**
+   * Replaces the current data in this buffer with provided data
+   * @param data The data to be saved in this buffer
+   *
+   * Reason:
+   * -
+   */
+  public setData(data: number[]): void {
+    this.clearData();
+    this.pushBackData(data);
+  }
+
+  /**
    * Adds data to this buffer
    * @param data
    */
@@ -177,6 +189,13 @@ export class GLBuffer {
     for (let d of data) {
       this._data.push(d);
     }
+  }
+
+  /**
+   * Clears out data in this buffer.
+   */
+  public clearData(): void {
+    this._data.length = 0;
   }
 
   /**
