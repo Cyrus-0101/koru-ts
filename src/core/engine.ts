@@ -9,6 +9,7 @@ import { BasicShader } from "./gl/shaders/basicShader";
 import { Color } from "./graphics/color";
 import { Material } from "./graphics/material";
 import { MaterialManager } from "./graphics/materialManager";
+import { InputManager, MouseContext } from "./input/inputManager";
 import { Matrix4x4 } from "./math/matrix4x4";
 import { MessageBus } from "./message/messageBus";
 import { ZoneManager } from "./world/zoneManager";
@@ -63,6 +64,8 @@ export class KoruTSEngine {
 
     // Initialize AssetManager
     AssetManager.initialize();
+
+    InputManager.initialize();
 
     // Initialize ZoneManager
     ZoneManager.initialize();
