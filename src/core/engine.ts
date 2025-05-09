@@ -122,12 +122,23 @@ export class KoruTSEngine {
    * 6. Schedule next frame
    */
   private loop(): void {
+    this.update();
+
+    this.render();
+  }
+
+  private update(): void {
+    let delta = performance.now() - this._previousTime;
     // Update message system
-    MessageBus.update(0);
+    MessageBus.update(delta);
 
     // Update active zone
-    ZoneManager.update(0);
+    ZoneManager.update(delta);
 
+    this._previousTime = performance.now();
+  }
+
+  private render(): void {
     // Clear the color buffer to remove previous frame
     gl.clear(gl.COLOR_BUFFER_BIT);
 
