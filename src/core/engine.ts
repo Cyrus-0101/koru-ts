@@ -34,6 +34,8 @@ export class KoruTSEngine {
   /** Basic shader for 2D sprite rendering */
   private _basicShader!: BasicShader;
 
+  private _previousTime: number = 0;
+
   /**
    * Orthographic projection matrix
    * Maps game world to screen coordinates
