@@ -4,6 +4,7 @@ import type { Shader } from "../gl/shaders";
 import { Matrix4x4 } from "../math/matrix4x4";
 import { Material } from "./material";
 import { MaterialManager } from "./materialManager";
+import { Vertex } from "./vertex";
 
 /**
  * Sprite - 2D textured quad renderer with material support
@@ -31,22 +32,24 @@ import { MaterialManager } from "./materialManager";
  */
 export class Sprite {
   /** Unique identifier for this sprite instance */
-  private _name: string;
+  protected _name: string;
 
   /** Width in pixels/units */
-  private _width: number;
+  protected _width: number;
 
   /** Height in pixels/units */
-  private _height: number;
+  protected _height: number;
 
   /** GPU vertex buffer containing positions and UVs */
-  private _buffer!: GLBuffer;
+  protected _buffer!: GLBuffer;
 
   /** Reference to material for rendering */
-  private _material: Material | undefined;
+  protected _material: Material | undefined;
 
   /** Identifier for material lookup */
-  private _materialName: string | undefined;
+  protected _materialName: string | undefined;
+
+  protected _vertices: Vertex[] = [];
 
   /**
    * Creates a new sprite instance
@@ -105,44 +108,59 @@ export class Sprite {
 
     // Define quad vertices using two triangles
     // Counter-clockwise winding order for proper face culling
-    let vertices = [
+    this._vertices = [
       // First triangle (bottom-left, top-left, top-right - x,y,z)  (U, V)
-      0.0,
-      0.0,
-      0.0, // Vertex 1: bottom-left
-      0.0,
-      0.0,
-      0.0,
-      this._height,
-      0.0, // Vertex 2: top-left
-      0.0,
-      1.0,
-      this._width,
-      this._height,
-      0.0, // Vertex 3: top-right
-      1.0,
-      1.0,
+      new Vertex(
+        0.0,
+        0.0,
+        0.0, // Vertex 1: bottom-left
+        0.0,
+        0.0
+      ),
+      new Vertex(
+        0.0,
+        this._height,
+        0.0, // Vertex 2: top-left
+        0.0,
+        1.0
+      ),
+      new Vertex(
+        this._width,
+        this._height,
+        0.0, // Vertex 3: top-right
+        1.0,
+        1.0
+      ),
 
       // Second triangle (top-right, bottom-right, bottom-left)
-      this._width,
-      this._height,
-      0.0, // Vertex 4: top-right
-      1.0,
-      1.0,
-      this._width,
-      0.0,
-      0.0, // Vertex 5: bottom-right
-      1.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0, // Vertex 6: bottom-left
-      0.0,
-      0.0,
+
+      new Vertex(
+        this._width,
+        this._height,
+        0.0, // Vertex 4: top-right
+        1.0,
+        1.0
+      ),
+      new Vertex(
+        this._width,
+        0.0,
+        0.0, // Vertex 5: bottom-right
+        1.0,
+        0.0
+      ),
+      new Vertex(
+        0.0,
+        0.0,
+        0.0, // Vertex 6: bottom-left
+        0.0,
+        0.0
+      ),
     ];
 
     // Upload vertex data to GPU memory
-    this._buffer.pushBackData(vertices);
+    for (let v of this._vertices) {
+      this._buffer.pushBackData(v.toArray());
+    }
 
     this._buffer.upload();
 
