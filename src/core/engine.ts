@@ -78,7 +78,11 @@ export class KoruTSEngine {
     BehaviourManager.registerBuilder(new RotationBehaviourBuilder());
 
     // Set default background color to black (R=0, G=0, B=0, A=1)
-    gl.clearColor(0, 0, 0, 1);
+    gl.clearColor(0, 0, 0.3, 1);
+
+    gl.enable(gl.BLEND);
+
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
     // Load and activate shader programs for rendering
     this._basicShader = new BasicShader();
@@ -87,6 +91,11 @@ export class KoruTSEngine {
     // Register default material with blue tint
     MaterialManager.registerMaterial(
       new Material("crate", "assets/textures/crate.jpg", Color.white())
+    );
+
+    // Register new material with blue tint
+    MaterialManager.registerMaterial(
+      new Material("duck", "assets/textures/duck.png", Color.white())
     );
 
     // Configure orthographic projection for 2D rendering
