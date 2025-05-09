@@ -1,4 +1,5 @@
 import { AssetManager } from "./assets/assetManager";
+import { AnimatedSpriteComponentBuilder } from "./assets/components/animatedSpriteComponent";
 import { ComponentManager } from "./assets/components/componentManager";
 import { SpriteComponentBuilder } from "./assets/components/spriteComponent";
 import { BehaviourManager } from "./behaviours/behaviourManager";
@@ -68,6 +69,7 @@ export class KoruTSEngine {
 
     // Register Builders
     ComponentManager.registerBuilder(new SpriteComponentBuilder());
+    ComponentManager.registerBuilder(new AnimatedSpriteComponentBuilder());
 
     // Register Behaviours
     BehaviourManager.registerBuilder(new RotationBehaviourBuilder());
