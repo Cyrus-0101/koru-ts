@@ -214,6 +214,12 @@ export class Zone {
       }
     }
 
+    if (dataSection.behaviors !== undefined) {
+      console.warn(
+        "WARN: 'behaviors' found in JSON (American spelling). Did you mean 'behaviours'?"
+      );
+    }
+
     if (dataSection.behaviours !== undefined) {
       // Process all behaviours
       for (let b in dataSection.behaviours) {
