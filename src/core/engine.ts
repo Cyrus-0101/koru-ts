@@ -97,12 +97,11 @@ export class KoruTSEngine implements IMessageHandler {
     this._basicShader = new BasicShader();
     this._basicShader.use();
 
-    // Register default material with blue tint
+    // Register material managers
     MaterialManager.registerMaterial(
       new Material("crate", "assets/textures/crate.jpg", Color.white())
     );
 
-    // Register new material with blue tint
     MaterialManager.registerMaterial(
       new Material("duck", "assets/textures/duck.png", Color.white())
     );
