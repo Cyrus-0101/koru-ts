@@ -57,10 +57,10 @@ export class ComponentManager {
           String(json.type)
         ].buildFromJson(json);
       }
-
-      throw new Error(
-        `ERROR: Component manager error - type missing or builder is not registered for this type '${json.type}'.`
-      );
     }
+
+    throw new Error(
+      `ERROR: Component manager error - type missing or builder is not registered for this type '${json.type}'.`
+    );
   }
 }
