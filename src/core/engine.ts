@@ -1,5 +1,6 @@
 import { AssetManager } from "./assets/assetManager";
 import { AnimatedSpriteComponentBuilder } from "./assets/components/animatedSpriteComponent";
+import { CollisionComponentBuilder } from "./assets/components/collisionComponent";
 import { ComponentManager } from "./assets/components/componentManager";
 import { SpriteComponentBuilder } from "./assets/components/spriteComponent";
 import { AudioManager } from "./audio/audioManager";
@@ -79,6 +80,7 @@ export class KoruTSEngine implements IMessageHandler {
     // Register Builders
     ComponentManager.registerBuilder(new SpriteComponentBuilder());
     ComponentManager.registerBuilder(new AnimatedSpriteComponentBuilder());
+    ComponentManager.registerBuilder(new CollisionComponentBuilder());
 
     // Register Behaviours
     BehaviourManager.registerBuilder(new RotationBehaviourBuilder());
