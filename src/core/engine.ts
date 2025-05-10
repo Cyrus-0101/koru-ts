@@ -2,6 +2,7 @@ import { AssetManager } from "./assets/assetManager";
 import { AnimatedSpriteComponentBuilder } from "./assets/components/animatedSpriteComponent";
 import { ComponentManager } from "./assets/components/componentManager";
 import { SpriteComponentBuilder } from "./assets/components/spriteComponent";
+import { AudioManager } from "./audio/audioManager";
 import { BehaviourManager } from "./behaviours/behaviourManager";
 import { KeyboardMovementBehaviourBuilder } from "./behaviours/keyboardMovementBehaviour";
 import { RotationBehaviourBuilder } from "./behaviours/rotationBehaviour";
@@ -97,15 +98,17 @@ export class KoruTSEngine implements IMessageHandler {
     this._basicShader = new BasicShader();
     this._basicShader.use();
 
-    // Register default material with blue tint
+    // Register material managers
     MaterialManager.registerMaterial(
       new Material("crate", "assets/textures/crate.jpg", Color.white())
     );
 
-    // Register new material with blue tint
     MaterialManager.registerMaterial(
       new Material("duck", "assets/textures/duck.png", Color.white())
     );
+
+    // Register audio managers
+    AudioManager.loadSoundFile("flap", "assets/sounds/flap.mp3", false);
 
     // Configure orthographic projection for 2D rendering
     this._projection = Matrix4x4.orthographic(
@@ -131,6 +134,8 @@ export class KoruTSEngine implements IMessageHandler {
     if (message.code === "MOUSE_UP") {
       let context = message.context as MouseContext;
       document.title = `Mouse Position: [${context.position.x}, ${context.position.y}]`;
+
+      AudioManager.playSound("flap");
     }
   }
 
