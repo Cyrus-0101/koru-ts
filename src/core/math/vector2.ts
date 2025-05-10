@@ -151,4 +151,10 @@ export class Vector2 {
 
     return this;
   }
+
+  public static distance(a: Vector2, b: Vector2): number {
+    let diff = a.subtract(b);
+
+    return Math.sqrt(diff.x * diff.x + diff._y * diff.y);
+  }
 }
