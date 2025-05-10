@@ -51,7 +51,7 @@ export class AnimatedSprite extends Sprite implements IMessageHandler {
   private _frameUVs: UVInfo[] = [];
 
   // Ms each frame lasts
-  private _frameTime: number = 333;
+  private _frameTime: number = 111;
 
   private _currentTime: number = 0;
 
