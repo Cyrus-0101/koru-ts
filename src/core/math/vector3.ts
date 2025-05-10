@@ -77,6 +77,20 @@ export class Vector3 {
     return [this._x, this._y, this._z];
   }
 
+  public set(x?: number, y?: number, z?: number): void {
+    if (x !== undefined) {
+      this._x = x;
+    }
+
+    if (y !== undefined) {
+      this._y = y;
+    }
+
+    if (z !== undefined) {
+      this._z = z;
+    }
+  }
+
   /**
    * Converts vector to Float32Array format
    * Used for WebGL uniform uploads and attribute data
@@ -173,5 +187,21 @@ export class Vector3 {
     this._z /= v._z;
 
     return this;
+  }
+
+  /**
+   * Checks if this vector is equal to another (component-wise)
+   * Returns true if all are true and false if any one is different
+   * @param v Vector to check equality for
+   * @returns true or false
+   */
+  public equals(v: Vector3): boolean {
+    return this._x == v._x && this._y == v._y && this._z == v._z;
+  }
+
+  public static distance(a: Vector3, b: Vector3): number {
+    let diff = a.subtract(b);
+
+    return Math.sqrt(diff.x * diff.x + diff._y * diff.y + diff.z * diff.z);
   }
 }
