@@ -1,5 +1,6 @@
 import type { Shader } from "../../gl/shaders";
 import { Sprite } from "../../graphics/sprite";
+import { Vector3 } from "../../math/vector3";
 import { BaseComponent } from "./baseComponent";
 import { ComponentManager } from "./componentManager";
 import type { IComponent } from "./IComponent";
@@ -17,6 +18,7 @@ import type { IComponentData } from "./IComponentData";
 export class SpriteComponentData implements IComponentData {
   public name!: string;
   public materialName!: string;
+  public origin: Vector3 = Vector3.zero;
 
   public setFromJson(json: any): void {
     if (json.name !== undefined) {
@@ -25,6 +27,10 @@ export class SpriteComponentData implements IComponentData {
 
     if (json.materialName !== undefined) {
       this.materialName = String(json.materialName);
+    }
+
+    if (json.origin !== undefined) {
+      this.origin.setFromJson(json.origin);
     }
   }
 }
@@ -86,6 +92,11 @@ export class Spritecomponent extends BaseComponent {
     super(data);
 
     this._sprite = new Sprite(data.name, data.materialName);
+
+    // Only check when origin is not default
+    if (!data.origin.equals(Vector3.zero)) {
+      this._sprite.origin.copyFrom(data.origin);
+    }
   }
 
   /**
