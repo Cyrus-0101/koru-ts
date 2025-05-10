@@ -23,7 +23,20 @@
 					"frameWidth": 17,
 					"frameHeight": 12,
 					"frameCount": 3,
-					"frameSequence": [0,1,2,1]
+					"frameSequence": [
+						0,
+						1,
+						2,
+						1
+					]
+				},
+				{
+					"name": "duckCollision",
+					"type": "collision",
+					"shape": {
+						"type": "circle",
+						"radius": 68
+					}
 				}
 			],
 			"behaviours": [
@@ -55,7 +68,11 @@
 						{
 							"name": "test",
 							"type": "sprite",
-							"materialName": "crate"
+							"materialName": "crate",
+							"origin": {
+								"x": 0.5,
+								"y": 0.5
+							}
 						}
 					],
 					"behaviours": [
@@ -73,7 +90,11 @@
 				{
 					"name": "test",
 					"type": "sprite",
-					"materialName": "crate"
+					"materialName": "crate",
+					"origin": {
+						"x": 0.5,
+						"y": 0.5
+					}
 				}
 			],
 			"behaviours": [
