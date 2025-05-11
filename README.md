@@ -1030,6 +1030,98 @@ start() {
 ```
 
 
+### [PR:10 Collision System Implementation](https://github.com/Cyrus-0101/koru-ts/pull/10)
+
+This PR introduces a comprehensive collision detection system with shape-based intersection testing and component architecture:
+
+1. **Core Collision Components**
+
+   * Created `CollisionComponent` class with builder pattern for JSON serialization
+   * Implemented `IShape2D` interface as foundation for collision shapes
+   * Developed `Rectangle2D` and `Circle2D` classes implementing intersection logic
+
+```typescript
+// Collision component registration
+ComponentManager.registerBuilder(new CollisionComponentBuilder());
+
+// Example collision configuration
+const collision = new CollisionComponent({
+    shape: "rectangle",
+    width: 32,
+    height: 32
+});
+```
+
+2. **Shape Mathematics**
+
+   * Implemented dynamic vertex calculation for shape transformations
+   * Added distance calculation between vector points
+   * Created origin-based collision detection system
+
+```typescript
+// Rectangle intersection check
+const rect1 = new Rectangle2D(width, height);
+const rect2 = new Rectangle2D(width, height);
+const isColliding = rect1.intersects(rect2);
+```
+
+3. **Collision Management System**
+
+   * Built `CollisionManager` class to handle game object collisions
+   * Integrated collision system into engine update loop
+   * Implemented optimized intersection algorithms
+
+```typescript
+// Collision system initialization
+start() {
+    CollisionManager.initialize();
+    MessageBus.subscribe("COLLISION_EVENT", this);
+}
+```
+
+4. **Vector Mathematics**
+
+   * Added clone methods for Vector2 objects
+   * Fixed distance calculation between vectors
+   * Implemented helper methods for shape transformations
+
+```typescript
+// Vector operations
+const v1 = new Vector2(10, 10);
+const v2 = v1.clone();
+const distance = Vector2.distance(v1, v2);
+```
+
+5. **JSON Configuration Support**
+
+   * Added type-safe collision data serialization
+   * Implemented builder pattern for component creation
+   * Created test zone with collision configuration
+
+```json
+// Example collision configuration
+{
+    "type": "collision",
+    "shape": "circle",
+    "radius": 16,
+    "offset": { "x": 0, "y": 0 }
+}
+```
+
+6. **Engine Integration**
+
+   * Refactored component directory structure
+   * Added collision system to core update loop
+   * Implemented origin calculation within shapes
+
+```typescript
+// Engine update loop
+update(time: number) {
+    CollisionManager.update(time);
+    // ... other systems
+}
+```
+
 ## References
 
 - [TypeScript Documentation](https://www.typescriptlang.org/docs/)
