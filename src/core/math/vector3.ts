@@ -1,3 +1,5 @@
+import { Vector2 } from "./vector2";
+
 /**
  * Vector3 - Represents a 3D vector with x, y, z components
  * Used for:
@@ -203,5 +205,21 @@ export class Vector3 {
     let diff = a.subtract(b);
 
     return Math.sqrt(diff.x * diff.x + diff._y * diff.y + diff.z * diff.z);
+  }
+
+  /**
+   * Clones a vector and returns a new one
+   * @returns new Vector2 with cloned values
+   */
+  public clone(): Vector3 {
+    return new Vector3(this._x, this._y, this._z);
+  }
+
+  /**
+   * Hacky method to convert a Vector3 to Vector2 with x and y values passed
+   * @returns new Vector2 with x,y values
+   */
+  public toVector2(): Vector2 {
+    return new Vector2(this._x, this._y);
   }
 }
