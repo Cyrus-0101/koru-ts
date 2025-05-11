@@ -1,8 +1,12 @@
-import { MESSAGE_ASSET_LOADER_ASSET_LOADED } from "../assets/assetManager";
+import {
+  AssetManager,
+  MESSAGE_ASSET_LOADER_ASSET_LOADED,
+} from "../assets/assetManager";
 import type { ImageAsset } from "../assets/imageAssetLoader";
 import { Vector2 } from "../math/vector2";
 import type { IMessageHandler } from "../message/IMessageHandler";
 import { Message } from "../message/message";
+import { MaterialManager } from "./materialManager";
 import { Sprite } from "./sprite";
 
 class UVInfo {
@@ -102,7 +106,10 @@ export class AnimatedSprite extends Sprite implements IMessageHandler {
    */
   public load(): void {
     super.load();
-    // Frame width and height
+
+    if (!this._assetLoaded) {
+      this.setUpFromMaterial();
+    }
   }
 
   /**
@@ -172,6 +179,8 @@ export class AnimatedSprite extends Sprite implements IMessageHandler {
    */
   public update(time: number): void {
     if (!this._assetLoaded) {
+      this.setUpFromMaterial();
+
       return;
     }
     this._currentTime += time;
@@ -237,6 +246,23 @@ export class AnimatedSprite extends Sprite implements IMessageHandler {
       let max: Vector2 = new Vector2(uMax, vMax);
 
       this._frameUVs.push(new UVInfo(min, max));
+    }
+  }
+
+  // Avoiding race conditions optimization
+  private setUpFromMaterial(): void {
+    if (!this._assetLoaded) {
+      let material = MaterialManager.getMaterial(this._materialName!);
+
+      if (material?.diffuseTexture?.isLoaded) {
+        if (AssetManager.isAssetLoaded(material.diffuseTextureName)) {
+          this._assetHeight = material.diffuseTexture.height;
+          this._assetWidth = material.diffuseTexture.width;
+          this._assetLoaded = true;
+
+          this.calculateUVs();
+        }
+      }
     }
   }
 }
