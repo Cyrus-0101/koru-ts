@@ -45,10 +45,12 @@ export class Vector2 {
     this._y = value;
   }
 
+  /** Static method that returns a new Vector2 with default values = 0s */
   public static get zero(): Vector2 {
     return new Vector2();
   }
 
+  /** Static method that returns a new Vector2(1, 1) */
   public static get one(): Vector2 {
     return new Vector2(1, 1);
   }
@@ -150,5 +152,19 @@ export class Vector2 {
     this._y /= v._y;
 
     return this;
+  }
+
+  public static distance(a: Vector2, b: Vector2): number {
+    let diff = a.clone().subtract(b);
+
+    return Math.sqrt(diff.x * diff.x + diff.y * diff.y);
+  }
+
+  /**
+   * Clones a vector and returns a new one
+   * @returns new Vector2 with cloned values
+   */
+  public clone(): Vector2 {
+    return new Vector2(this._x, this._y);
   }
 }

@@ -1,9 +1,11 @@
 import { AssetManager } from "./assets/assetManager";
-import { AnimatedSpriteComponentBuilder } from "./assets/components/animatedSpriteComponent";
-import { ComponentManager } from "./assets/components/componentManager";
-import { SpriteComponentBuilder } from "./assets/components/spriteComponent";
+import { AnimatedSpriteComponentBuilder } from "./components/animatedSpriteComponent";
+import { CollisionComponentBuilder } from "./components/collisionComponent";
+import { ComponentManager } from "./components/componentManager";
+import { SpriteComponentBuilder } from "./components/spriteComponent";
 import { AudioManager } from "./audio/audioManager";
 import { BehaviourManager } from "./behaviours/behaviourManager";
+import { CollisionManager } from "./collision/collisionManager";
 import { KeyboardMovementBehaviourBuilder } from "./behaviours/keyboardMovementBehaviour";
 import { RotationBehaviourBuilder } from "./behaviours/rotationBehaviour";
 import { gl, GLUtilities } from "./gl/gl";
@@ -79,6 +81,7 @@ export class KoruTSEngine implements IMessageHandler {
     // Register Builders
     ComponentManager.registerBuilder(new SpriteComponentBuilder());
     ComponentManager.registerBuilder(new AnimatedSpriteComponentBuilder());
+    ComponentManager.registerBuilder(new CollisionComponentBuilder());
 
     // Register Behaviours
     BehaviourManager.registerBuilder(new RotationBehaviourBuilder());
@@ -164,6 +167,9 @@ export class KoruTSEngine implements IMessageHandler {
 
     // Update active zone
     ZoneManager.update(delta);
+
+    // Update Collisions
+    CollisionManager.update(delta);
 
     this._previousTime = performance.now();
   }

@@ -2,6 +2,7 @@ import { gl } from "../gl/gl";
 import { AttributeInfo, GLBuffer } from "../gl/glBuffer";
 import type { Shader } from "../gl/shaders";
 import { Matrix4x4 } from "../math/matrix4x4";
+import { Vector3 } from "../math/vector3";
 import { Material } from "./material";
 import { MaterialManager } from "./materialManager";
 import { Vertex } from "./vertex";
@@ -50,6 +51,8 @@ export class Sprite {
   protected _materialName: string | undefined;
 
   protected _vertices: Vertex[] = [];
+
+  protected _origin: Vector3 = Vector3.zero;
 
   /**
    * Creates a new sprite instance
@@ -106,66 +109,7 @@ export class Sprite {
     // Register attribute with buffer for automatic setup during binding
     this._buffer.addAttributeLocation(texCoordAttributes);
 
-    // Define quad vertices using two triangles
-    // Counter-clockwise winding order for proper face culling
-    this._vertices = [
-      // First triangle (bottom-left, top-left, top-right - x,y,z)  (U, V)
-      new Vertex(
-        0.0,
-        0.0,
-        0.0, // Vertex 1: bottom-left
-        0.0,
-        0.0
-      ),
-      new Vertex(
-        0.0,
-        this._height,
-        0.0, // Vertex 2: top-left
-        0.0,
-        1.0
-      ),
-      new Vertex(
-        this._width,
-        this._height,
-        0.0, // Vertex 3: top-right
-        1.0,
-        1.0
-      ),
-
-      // Second triangle (top-right, bottom-right, bottom-left)
-
-      new Vertex(
-        this._width,
-        this._height,
-        0.0, // Vertex 4: top-right
-        1.0,
-        1.0
-      ),
-      new Vertex(
-        this._width,
-        0.0,
-        0.0, // Vertex 5: bottom-right
-        1.0,
-        0.0
-      ),
-      new Vertex(
-        0.0,
-        0.0,
-        0.0, // Vertex 6: bottom-left
-        0.0,
-        0.0
-      ),
-    ];
-
-    // Upload vertex data to GPU memory
-    for (let v of this._vertices) {
-      this._buffer.pushBackData(v.toArray());
-    }
-
-    this._buffer.upload();
-
-    // Unbind buffer to prevent accidental modifications
-    this._buffer.unbind();
+    this.calculateVertices();
   }
 
   /**
@@ -174,6 +118,15 @@ export class Sprite {
    */
   public get name(): string {
     return this._name;
+  }
+
+  public get origin(): Vector3 {
+    return this._origin;
+  }
+
+  public set origin(value: Vector3) {
+    this._origin = value;
+    this.calculateVertices();
   }
 
   /**
@@ -246,5 +199,111 @@ export class Sprite {
 
     // Draw quad
     this._buffer.draw();
+  }
+
+  protected calculateVertices(): void {
+    let minX = -(this._width * this.origin.x);
+
+    let maxX = this._width * (1.0 - this._origin.x);
+
+    let minY = -(this._height * this.origin.y);
+
+    let maxY = this._height * (1.0 - this._origin.y);
+
+    // Define quad vertices using two triangles
+    // Counter-clockwise winding order for proper face culling
+    this._vertices = [
+      // First triangle (bottom-left, top-left, top-right - x,y,z)  (U, V)
+      new Vertex(
+        minX,
+        minY,
+        0.0, // Vertex 1: bottom-left
+        0.0,
+        0.0
+      ),
+      new Vertex(
+        minX,
+        maxY,
+        0.0, // Vertex 2: top-left
+        0.0,
+        1.0
+      ),
+      new Vertex(
+        maxX,
+        maxY,
+        0.0, // Vertex 3: top-right
+        1.0,
+        1.0
+      ),
+
+      // Second triangle (top-right, bottom-right, bottom-left)
+
+      new Vertex(
+        maxX,
+        maxY,
+        0.0, // Vertex 4: top-right
+        1.0,
+        1.0
+      ),
+      new Vertex(
+        maxX,
+        minY,
+        0.0, // Vertex 5: bottom-right
+        1.0,
+        0.0
+      ),
+      new Vertex(
+        minX,
+        minY,
+        0.0, // Vertex 6: bottom-left
+        0.0,
+        0.0
+      ),
+    ];
+
+    // Upload vertex data to GPU memory
+    for (let v of this._vertices) {
+      this._buffer.pushBackData(v.toArray());
+    }
+
+    this._buffer.upload();
+
+    // Unbind buffer to prevent accidental modifications
+    this._buffer.unbind();
+  }
+
+  /**
+   * Recalculates the position of all the vertices
+   */
+  protected recalculateVertices(): void {
+    let minX = -(this._width * this.origin.x);
+
+    let maxX = this._width * (1.0 - this._origin.x);
+
+    let minY = -(this._height * this.origin.y);
+
+    let maxY = this._height * (1.0 - this._origin.y);
+
+    // First triangle (bottom-left, top-left, top-right - x,y,z)  (U, V)
+    this._vertices[0].position.set(minX, minY);
+    this._vertices[1].position.set(minX, maxY);
+    this._vertices[2].position.set(maxX, maxY);
+    // Second triangle (top-right, bottom-right, bottom-left)
+
+    this._vertices[3].position.set(maxX, maxY);
+    this._vertices[4].position.set(maxX, minY);
+    this._vertices[5].position.set(minX, minY);
+
+    this._buffer.clearData();
+
+    // Upload vertex data to GPU memory
+    for (let v of this._vertices) {
+      this._buffer.pushBackData(v.toArray());
+    }
+
+    this._buffer.upload();
+
+    // Unbind buffer to prevent accidental modifications
+    this._buffer.unbind();
   }
 }

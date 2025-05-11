@@ -1,5 +1,5 @@
-import type { Shader } from "../../gl/shaders";
-import type { SimObject } from "../../world/simObject";
+import type { Shader } from "../gl/shaders";
+import type { SimObject } from "../world/simObject";
 
 /**
  * IComponent - Core interface for all game object components

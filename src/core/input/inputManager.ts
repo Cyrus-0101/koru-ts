@@ -51,22 +51,24 @@ export class InputManager {
     return new Vector2(InputManager._mouseX, InputManager._mouseY);
   }
 
+  // TO-DO: Revisit this buggy code
   public static onKeyDown(event: KeyboardEvent): boolean {
     InputManager._keys[event.keyCode] = true;
 
-    event.preventDefault();
-    event.stopPropagation();
+    // event.preventDefault();
+    // event.stopPropagation();
 
-    return false;
+    return true;
   }
 
+  // TO-DO: Revisit this buggy code
   public static onKeyUp(event: KeyboardEvent): boolean {
     InputManager._keys[event.keyCode] = false;
 
-    event.preventDefault();
-    event.stopPropagation();
+    // event.preventDefault();
+    // event.stopPropagation();
 
-    return false;
+    return true;
   }
 
   private static onMouseMove(event: MouseEvent) {

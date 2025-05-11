@@ -1,3 +1,5 @@
+import { Vector2 } from "./vector2";
+
 /**
  * Vector3 - Represents a 3D vector with x, y, z components
  * Used for:
@@ -75,6 +77,20 @@ export class Vector3 {
    */
   public toArray(): number[] {
     return [this._x, this._y, this._z];
+  }
+
+  public set(x?: number, y?: number, z?: number): void {
+    if (x !== undefined) {
+      this._x = x;
+    }
+
+    if (y !== undefined) {
+      this._y = y;
+    }
+
+    if (z !== undefined) {
+      this._z = z;
+    }
   }
 
   /**
@@ -173,5 +189,37 @@ export class Vector3 {
     this._z /= v._z;
 
     return this;
+  }
+
+  /**
+   * Checks if this vector is equal to another (component-wise)
+   * Returns true if all are true and false if any one is different
+   * @param v Vector to check equality for
+   * @returns true or false
+   */
+  public equals(v: Vector3): boolean {
+    return this._x == v._x && this._y == v._y && this._z == v._z;
+  }
+
+  public static distance(a: Vector3, b: Vector3): number {
+    let diff = a.subtract(b);
+
+    return Math.sqrt(diff.x * diff.x + diff._y * diff.y + diff.z * diff.z);
+  }
+
+  /**
+   * Clones a vector and returns a new one
+   * @returns new Vector2 with cloned values
+   */
+  public clone(): Vector3 {
+    return new Vector3(this._x, this._y, this._z);
+  }
+
+  /**
+   * Hacky method to convert a Vector3 to Vector2 with x and y values passed
+   * @returns new Vector2 with x,y values
+   */
+  public toVector2(): Vector2 {
+    return new Vector2(this._x, this._y);
   }
 }
