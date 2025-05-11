@@ -59,6 +59,7 @@ export class ComponentManager {
       }
     }
 
+    // TO-DO: Revisit
     throw new Error(
       `ERROR: Component manager error - type missing or builder is not registered for this type '${json.type}'.`
     );
