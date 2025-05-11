@@ -1,8 +1,8 @@
 import { AssetManager } from "./assets/assetManager";
-import { AnimatedSpriteComponentBuilder } from "./assets/components/animatedSpriteComponent";
-import { CollisionComponentBuilder } from "./assets/components/collisionComponent";
-import { ComponentManager } from "./assets/components/componentManager";
-import { SpriteComponentBuilder } from "./assets/components/spriteComponent";
+import { AnimatedSpriteComponentBuilder } from "./components/animatedSpriteComponent";
+import { CollisionComponentBuilder } from "./components/collisionComponent";
+import { ComponentManager } from "./components/componentManager";
+import { SpriteComponentBuilder } from "./components/spriteComponent";
 import { AudioManager } from "./audio/audioManager";
 import { BehaviourManager } from "./behaviours/behaviourManager";
 import { CollisionManager } from "./collision/collisionManager";
