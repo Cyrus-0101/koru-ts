@@ -5,6 +5,7 @@ import { ComponentManager } from "./assets/components/componentManager";
 import { SpriteComponentBuilder } from "./assets/components/spriteComponent";
 import { AudioManager } from "./audio/audioManager";
 import { BehaviourManager } from "./behaviours/behaviourManager";
+import { CollisionManager } from "./collision/collisionManager";
 import { KeyboardMovementBehaviourBuilder } from "./behaviours/keyboardMovementBehaviour";
 import { RotationBehaviourBuilder } from "./behaviours/rotationBehaviour";
 import { gl, GLUtilities } from "./gl/gl";

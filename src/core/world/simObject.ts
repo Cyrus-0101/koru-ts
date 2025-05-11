@@ -1,4 +1,4 @@
-import type { IComponent } from "../assets/components/IComponent";
+import type { IComponent } from "../components/IComponent";
 import type { IBehaviour } from "../behaviours/IBehaviour";
 import type { Shader } from "../gl/shaders";
 import { Matrix4x4 } from "../math/matrix4x4";

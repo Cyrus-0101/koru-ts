@@ -1,4 +1,4 @@
-import { ComponentManager } from "../assets/components/componentManager";
+import { ComponentManager } from "../components/componentManager";
 import { BehaviourManager } from "../behaviours/behaviourManager";
 import type { Shader } from "../gl/shaders";
 import { Scene } from "./scene";
