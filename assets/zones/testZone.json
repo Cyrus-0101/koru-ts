@@ -39,7 +39,7 @@
 					"type": "collision",
 					"shape": {
 						"type": "circle",
-						"radius": 68
+						"radius": 66
 					}
 				}
 			],
