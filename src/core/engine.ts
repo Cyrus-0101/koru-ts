@@ -168,6 +168,9 @@ export class KoruTSEngine implements IMessageHandler {
     // Update active zone
     ZoneManager.update(delta);
 
+    // Update Collisions
+    CollisionManager.update(delta);
+
     this._previousTime = performance.now();
   }
 
