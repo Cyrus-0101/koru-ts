@@ -122,7 +122,7 @@ export abstract class Shader {
     gl.compileShader(shader);
 
     // Check for compilation errors
-    let error = gl.getShaderInfoLog(shader);
+    let error = gl.getShaderInfoLog(shader)?.trim();
     if (error !== "") {
       throw new Error(
         "ERROR: Error compiling shader: " + this._name + ": " + error
@@ -153,7 +153,7 @@ export abstract class Shader {
     gl.linkProgram(this._program);
 
     // Check for linking errors
-    let error = gl.getProgramInfoLog(this._program);
+    let error = gl.getProgramInfoLog(this._program)?.trim();
     if (error !== "") {
       throw new Error(
         "ERROR: Error linking shader: " + this._name + ": " + error
