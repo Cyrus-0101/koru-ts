@@ -1,5 +1,6 @@
 import type { IBehaviour } from "./IBehaviour";
 import type { IBehaviourBuilder } from "./IBehaviourBuilder";
+
 /**
  * BehaviourManager - Central registry for managing behaviour types and builders
  *
@@ -29,7 +30,6 @@ export class BehaviourManager {
    * @throws Error if behaviour type is already registered
    */
   public static registerBuilder(builder: IBehaviourBuilder): void {
-    console.log("Builder registered...");
     BehaviourManager._registeredBuilders[builder.type] = builder;
   }
 
