@@ -38,6 +38,12 @@ export interface IComponent {
   load(): void;
 
   /**
+   * Avoids race conditions
+   * Helps us wait until update is ready
+   */
+  updateReady(): void;
+
+  /**
    * Updates component state each frame
    * @param time The current game time in milliseconds
    */
