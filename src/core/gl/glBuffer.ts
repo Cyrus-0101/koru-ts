@@ -11,11 +11,9 @@ export class AttributeInfo {
    * @param size Number of components (e.g., 3 for vec3)
    * @param offset Byte offset from start of vertex
    */
-  constructor(
-    public location: number = 0,
-    public size: number = 0,
-    public offset: number = 0
-  ) {}
+  public location!: number;
+  public size!: number;
+  public offset: number = 0;
 }
 
 /**
@@ -85,16 +83,19 @@ export class GLBuffer {
       case gl.INT:
       case gl.UNSIGNED_INT:
         this._typeSize = 4;
+
         break;
 
       case gl.SHORT:
       case gl.UNSIGNED_SHORT:
         this._typeSize = 2;
+
         break;
 
       case gl.BYTE:
       case gl.UNSIGNED_BYTE:
         this._typeSize = 1;
+
         break;
 
       default:
