@@ -29,7 +29,7 @@ export abstract class Shader {
   private _attributes: { [name: string]: number } = {};
 
   /** Cache of uniform locations for faster updates */
-  private _uniforms: { [name: string]: WebGLUniformLocation | null } = {};
+  private _uniforms: { [name: string]: WebGLUniformLocation } = {};
 
   /**
    * Creates a new shader program
@@ -81,6 +81,7 @@ export abstract class Shader {
         `ERROR: Unable to find uniform named '${name}' in shader '${this._name}'`
       );
     }
+
     return this._uniforms[name];
   }
 
@@ -112,10 +113,7 @@ export abstract class Shader {
    */
   private loadShader(source: string, shaderType: number): WebGLShader {
     // Create a new shader object
-    let shader = gl.createShader(shaderType);
-    if (!shader) {
-      throw new Error("ERROR: Unable to create shader");
-    }
+    let shader: WebGLShader = gl.createShader(shaderType)!;
 
     // Set the shader source code and compile it
     gl.shaderSource(shader, source);
@@ -123,9 +121,10 @@ export abstract class Shader {
 
     // Check for compilation errors
     let error = gl.getShaderInfoLog(shader)?.trim();
+
     if (error !== "") {
       throw new Error(
-        "ERROR: Error compiling shader: " + this._name + ": " + error
+        "ERROR: Error compiling shader: '" + this._name + "': " + error
       );
     }
 
@@ -156,7 +155,7 @@ export abstract class Shader {
     let error = gl.getProgramInfoLog(this._program)?.trim();
     if (error !== "") {
       throw new Error(
-        "ERROR: Error linking shader: " + this._name + ": " + error
+        "ERROR: Error linking shader: '" + this._name + "': " + error
       );
     }
   }
@@ -172,7 +171,7 @@ export abstract class Shader {
    */
   private detectAttributes(): void {
     // Get the number of active attributes in the shader program
-    let attributeCount = gl.getProgramParameter(
+    let attributeCount: number = gl.getProgramParameter(
       this._program,
       gl.ACTIVE_ATTRIBUTES
     );
@@ -180,7 +179,7 @@ export abstract class Shader {
     // Iterate through all active attributes
     for (let i = 0; i < attributeCount; i++) {
       // Get information about the attribute at index i
-      let info = gl.getActiveAttrib(this._program, i);
+      let info: WebGLActiveInfo = gl.getActiveAttrib(this._program, i)!;
 
       if (!info) {
         break;
@@ -213,9 +212,9 @@ export abstract class Shader {
     );
 
     // Iterate through all active uniforms
-    for (let i = 0; i < uniformCount; i++) {
+    for (let i = 0; i < uniformCount; ++i) {
       // Get information about the uniform at index i
-      let info = gl.getActiveUniform(this._program, i);
+      let info: WebGLActiveInfo = gl.getActiveUniform(this._program, i)!;
 
       if (!info) {
         break;
@@ -226,7 +225,7 @@ export abstract class Shader {
       this._uniforms[info.name] = gl.getUniformLocation(
         this._program,
         info.name
-      );
+      )!;
     }
   }
 }
