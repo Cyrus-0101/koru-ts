@@ -25,9 +25,9 @@ export class KeyboardMovementBehaviourData implements IBehaviourData {
   public setFromJson(json: any): void {
     if (json.name === undefined) {
       throw new Error("ERROR: Name must be defined in behaviour data.");
+    } else {
+      this.name = String(json.name);
     }
-
-    this.name = String(json.name);
 
     if (json.speed !== undefined) {
       this.speed = Number(json.speed);
