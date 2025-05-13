@@ -202,7 +202,7 @@ export class GLBuffer {
    * Uploads this buffer's data to the GPU
    */
   public upload(): void {
-    gl.bindBuffer(gl.ARRAY_BUFFER, this._buffer);
+    gl.bindBuffer(this._targetBufferType, this._buffer);
 
     let bufferData: ArrayBufferView;
 
