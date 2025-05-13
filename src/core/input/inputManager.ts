@@ -48,7 +48,7 @@ export class InputManager {
 
   public static getMousePosition(): Vector2 {
     // TO-DO: Implement number system for speed
-    return new Vector2(InputManager._mouseX, InputManager._mouseY);
+    return new Vector2(this._mouseX, this._mouseY);
   }
 
   // TO-DO: Revisit this buggy code
