@@ -84,8 +84,10 @@ export class ImageAssetLoader implements IAssetLoader {
    * @param image Loaded image element
    */
   private onImageLoaded(assetName: string, image: HTMLImageElement) {
-    console.log(`LOG: onImageLoaded: assetName/image, ${assetName} ${image}`);
+    console.info(`LOG: onImageLoaded: assetName/image, ${assetName} ${image}`);
+
     let asset = new ImageAsset(assetName, image);
+
     AssetManager.onAssetLoaded(asset);
   }
 }

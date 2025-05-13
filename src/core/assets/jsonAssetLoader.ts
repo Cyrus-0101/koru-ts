@@ -51,12 +51,8 @@ export class JsonAssetLoader implements IAssetLoader {
     request.send();
   }
 
-  private onJsonLoaded(
-    assetName: string,
-    request: XMLHttpRequest,
-    event: ProgressEvent
-  ) {
-    console.log("onJSONLoaded: assetName/request", assetName, request);
+  private onJsonLoaded(assetName: string, request: XMLHttpRequest) {
+    console.info("LOG: onJSONLoaded: assetName/request", assetName, request);
 
     // To-DO: Add robust error handling
     if (request.readyState === request.DONE) {
