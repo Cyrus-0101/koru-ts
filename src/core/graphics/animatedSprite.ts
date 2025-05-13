@@ -103,7 +103,7 @@ export class AnimatedSprite extends Sprite implements IMessageHandler {
   /**
    * Indicates if this animated sprite is currently playing
    */
-  public isPlaying(): boolean {
+  public get isPlaying(): boolean {
     return this._isPlaying;
   }
 
