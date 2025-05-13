@@ -109,7 +109,12 @@ export class Spritecomponent extends BaseComponent {
 
     this._height = data.height;
 
-    this._sprite = new Sprite(data.name, data.materialName);
+    this._sprite = new Sprite(
+      data.name,
+      data.materialName,
+      this._width,
+      this._height
+    );
 
     // Only check when origin is not default
     if (!data.origin.equals(Vector3.zero)) {
@@ -135,10 +140,5 @@ export class Spritecomponent extends BaseComponent {
 
     // Render parent content
     super.render(shader);
-  }
-
-  /** Gets managed sprite instance */
-  public get sprite(): Sprite {
-    return this._sprite;
   }
 }
