@@ -41,10 +41,12 @@ export class CollisionComponentData implements IComponentData {
       switch (shapeType) {
         case "rectangle":
           this.shape = new Rectangle2D();
+
           break;
 
         case "circle":
           this.shape = new Circle2D();
+
           break;
 
         default:
@@ -151,14 +153,14 @@ export class CollisionComponent extends BaseComponent {
   }
 
   public onCollisionEntry(other: CollisionComponent): void {
-    console.log("onCollisionEntry", this, other);
+    // console.log("onCollisionEntry", this, other);
   }
 
   public onCollisionUpdate(other: CollisionComponent): void {
-    console.log("onCollisionUpdate", this, other);
+    // console.log("onCollisionUpdate", this, other);
   }
 
   public onCollisionExit(other: CollisionComponent): void {
-    console.log("onCollisionExit", this, other);
+    // console.log("onCollisionExit", this, other);
   }
 }
