@@ -132,6 +132,8 @@ export class KoruTSEngine implements IMessageHandler {
 
     // Register audio managers
     AudioManager.loadSoundFile("flap", "assets/sounds/flap.mp3", false);
+    AudioManager.loadSoundFile("ting", "assets/sounds/ting.mp3", false);
+    AudioManager.loadSoundFile("dead", "assets/sounds/dead.mp3", false);
 
     // Configure orthographic projection for 2D rendering
     this._projection = Matrix4x4.orthographic(
