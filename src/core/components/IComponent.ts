@@ -5,7 +5,7 @@ import type { SimObject } from "../world/simObject";
  * IComponent - Core interface for all game object components
  *
  * Defines the base contract that all game components must implement.
- * Components are reusable behaviors that can be attached to game objects.
+ * Components are reusable behaviours that can be attached to game objects.
  *
  * Core Responsibilities:
  * - Lifecycle management (load/update/render)
