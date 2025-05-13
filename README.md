@@ -873,7 +873,7 @@ Key Features:
 - Type-safe component creation from JSON
 - Recursive scene graph construction
 - Asynchronous zone loading
-- Clean separation between data and behavior
+- Clean separation between data and behaviour
 - Comprehensive error handling
 
 > The system enables data-driven game object creation while maintaining type safety and providing clear lifecycle management.
