@@ -95,7 +95,7 @@ export class AnimatedSprite extends Sprite implements IMessageHandler {
     this._frameSequence = frameSequence;
 
     Message.subscribe(
-      MESSAGE_ASSET_LOADER_ASSET_LOADED + this._material?.diffuseTextureName,
+      MESSAGE_ASSET_LOADER_ASSET_LOADED + this._material!.diffuseTextureName,
       this
     );
   }
