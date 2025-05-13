@@ -107,8 +107,6 @@ export class KoruTSEngine implements IMessageHandler {
     BehaviourManager.registerBuilder(new RotationBehaviourBuilder());
     BehaviourManager.registerBuilder(new KeyboardMovementBehaviourBuilder());
 
-    Message.subscribe("MOUSE_UP", this);
-
     // Set default background color to black (R=0, G=0, B=0, A=1)
     gl.clearColor(0, 0, 0.3, 1);
 
@@ -158,9 +156,8 @@ export class KoruTSEngine implements IMessageHandler {
   public onMessage(message: Message): void {
     if (message.code === "MOUSE_UP") {
       let context = message.context as MouseContext;
-      document.title = `Mouse Position: [${context.position.x}, ${context.position.y}]`;
 
-      AudioManager.playSound("flap");
+      document.title = `Mouse Position: [${context.position.x}, ${context.position.y}]`;
     }
   }
 
