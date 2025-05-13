@@ -175,31 +175,33 @@ export class AnimatedSprite extends Sprite implements IMessageHandler {
   /**
    * Updates routines on sprite state
    * Called each frame by the game engine
-   *let totalWidth: number = 0;
-    let yValue: number = 0;
+   * ```typescript
+      let totalWidth: number = 0;
+      let yValue: number = 0;
 
-    for (let i = 0; i < this._frameCount; ++i) {
-      totalWidth += i * this._frameWidth;
+      for (let i = 0; i < this._frameCount; ++i) {
+        totalWidth += i * this._frameWidth;
 
-      if (totalWidth > this._width) {
-        yValue++;
-        totalWidth = 0;
+        if (totalWidth > this._width) {
+          yValue++;
+          totalWidth = 0;
+        }
+
+        let textureWidth = this._material?.diffuseTexture?.width!;
+        let textureHeight = this._material?.diffuseTexture?.height!;
+
+        let u = (i * this._frameWidth) / textureWidth;
+        let v = (yValue * this._frameHeight) / textureHeight;
+        let min: Vector2 = new Vector2(u, v);
+
+        let uMax = (i * this._frameWidth + this._frameWidth) / textureWidth;
+        let vMax =
+          (yValue * this._frameHeight + this._frameWidth) / textureHeight;
+        let max: Vector2 = new Vector2(uMax, vMax);
+
+        this._frameUVs.push(new UVInfo(min, max));
       }
-
-      let textureWidth = this._material?.diffuseTexture?.width!;
-      let textureHeight = this._material?.diffuseTexture?.height!;
-
-      let u = (i * this._frameWidth) / textureWidth;
-      let v = (yValue * this._frameHeight) / textureHeight;
-      let min: Vector2 = new Vector2(u, v);
-
-      let uMax = (i * this._frameWidth + this._frameWidth) / textureWidth;
-      let vMax =
-        (yValue * this._frameHeight + this._frameWidth) / textureHeight;
-      let max: Vector2 = new Vector2(uMax, vMax);
-
-      this._frameUVs.push(new UVInfo(min, max));
-    }
+     ```
 
    * @param time Current game time in milliseconds
    *
