@@ -30,7 +30,7 @@ export class SimObject {
   private _children: SimObject[] = [];
 
   /** Parent object reference */
-  private _parent!: SimObject;
+  private _parent?: SimObject;
 
   /** Tracks if object resources are loaded */
   private _isLoaded: boolean = false;
@@ -78,7 +78,7 @@ export class SimObject {
   }
 
   /** Gets parent object reference */
-  public get parent(): SimObject {
+  public get parent(): SimObject | undefined {
     return this._parent;
   }
 
