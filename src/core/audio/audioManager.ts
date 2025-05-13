@@ -1,6 +1,6 @@
 export class SoundEffect {
   public assetPath!: string;
-  private _player?: HTMLAudioElement;
+  private _player: HTMLAudioElement | undefined;
 
   public constructor(assetPath: string, loop: boolean) {
     this._player = new Audio(assetPath);
@@ -16,7 +16,7 @@ export class SoundEffect {
   }
 
   public destroy(): void {
-    delete this._player;
+    this._player = undefined;
   }
 
   public play(): void {
