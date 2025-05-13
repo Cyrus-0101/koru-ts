@@ -44,8 +44,9 @@ export class JsonAssetLoader implements IAssetLoader {
 
     request.open("GET", assetName);
 
-    request.addEventListener("load", (event: ProgressEvent) =>
-      this.onJsonLoaded(assetName, request, event)
+    request.addEventListener(
+      "load",
+      this.onJsonLoaded.bind(this, assetName, request)
     );
 
     request.send();
