@@ -42,6 +42,12 @@ export class KoruTSEngine implements IMessageHandler {
 
   private _previousTime: number = 0;
 
+  /** The width of the game in pixels- browser width */
+  private _gameWidth?: number;
+
+  /** The height of the game in pixels- browser height */
+  private _gameHeight?: number;
+
   /**
    * Orthographic projection matrix
    * Maps game world to screen coordinates
@@ -51,8 +57,14 @@ export class KoruTSEngine implements IMessageHandler {
   /**
    * Creates a new engine instance
    * Note: Actual initialization happens in start()
+   *
+   * @param height The height of the game in pixels
+   * @param width The width of the game in pixels
    */
-  public constructor() {}
+  public constructor(width?: number, height?: number) {
+    this._gameHeight = height;
+    this._gameWidth = width;
+  }
 
   /**
    * Initializes engine systems and starts game loop
@@ -69,6 +81,14 @@ export class KoruTSEngine implements IMessageHandler {
   public start(): void {
     // Initialize WebGL context and get canvas reference
     this._canvas = GLUtilities.initialize();
+
+    if (this._gameWidth !== undefined && this._gameHeight !== undefined) {
+      this._canvas.style.width = this._gameWidth + "px";
+      this._canvas.style.height = this._gameHeight + "px";
+
+      this._canvas.width = this._gameWidth;
+      this._canvas.height = this._gameHeight;
+    }
 
     // Initialize AssetManager
     AssetManager.initialize();
@@ -208,8 +228,10 @@ export class KoruTSEngine implements IMessageHandler {
    */
   public resize(): void {
     if (this._canvas !== undefined) {
-      this._canvas.width = window.innerWidth;
-      this._canvas.height = window.innerHeight;
+      if (this._gameWidth === undefined || this._gameHeight === undefined) {
+        this._canvas.width = window.innerWidth;
+        this._canvas.height = window.innerHeight;
+      }
 
       gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
