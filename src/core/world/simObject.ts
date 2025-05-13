@@ -216,6 +216,23 @@ export class SimObject {
     }
   }
 
+  public updateReady(): void {
+    // UpdateReady components
+    for (let c of this._components) {
+      c.updateReady();
+    }
+
+    // UpdateReady behavviours
+    for (let b of this._behaviours) {
+      b.updateReady();
+    }
+
+    // UpdateReady children
+    for (let c of this._children) {
+      c.updateReady();
+    }
+  }
+
   /**
    * Updates object state
    * Order:
@@ -239,7 +256,7 @@ export class SimObject {
       c.update(time);
     }
 
-    // Update components
+    // Update behaviours
     for (let b of this._behaviours) {
       b.update(time);
     }
