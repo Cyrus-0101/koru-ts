@@ -69,8 +69,9 @@ export class CollisionManager {
     component: CollisionComponent
   ): void {
     let index = CollisionManager._collisionComponents.indexOf(component);
+
     if (index !== -1) {
-      CollisionManager._collisionComponents.slice(index, -1);
+      CollisionManager._collisionComponents.slice(index, 1);
     }
   }
 
@@ -133,15 +134,17 @@ export class CollisionManager {
             Message.sendPriority("COLLISION_ENTRY: " + comp.name, this, col);
             Message.sendPriority("COLLISION_ENTRY: " + other.name, this, col);
 
-            CollisionManager._collisionData.push(col);
+            this._collisionData.push(col);
           }
         }
       }
     }
 
-    /** Detetct collisions that happened but were never updated
+    /**
+     * Detetct collisions that happened but were never updated
      * Create list to push data after an update
      * Maybe reverse loop to avoid overhead
+     * Removing old collision data
      *
      */
     let removeData: CollisionData[] = [];
@@ -158,6 +161,7 @@ export class CollisionManager {
     while (removeData.length !== 0) {
       let data = removeData.shift()!;
       let index = CollisionManager._collisionData.indexOf(data);
+
       CollisionManager._collisionData.splice(index, 1);
 
       data.a.onCollisionExit(data.b);
