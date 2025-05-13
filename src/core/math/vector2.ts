@@ -1,3 +1,5 @@
+import { Vector3 } from "./vector3";
+
 /**
  * Vector2 - Represents a 2D vector with x, y components
  *
