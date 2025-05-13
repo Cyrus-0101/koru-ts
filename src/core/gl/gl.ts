@@ -1,4 +1,4 @@
-// Global WebGL rendering context that will be used across the engine
+/** Global WebGL rendering context that will be used across the engine */
 export let gl: WebGLRenderingContext;
 
 /**
@@ -7,7 +7,7 @@ export let gl: WebGLRenderingContext;
 export class GLUtilities {
   /**
    * Initializes WebGL context and sets up the canvas
-   * @param elementId Optional ID of existing canvas element
+   * @param elementId Optional ID of existing canvas element to search for
    * @returns The initialized canvas element
    * @throws Error if canvas element cannot be found or WebGL context cannot be initialized
    */
