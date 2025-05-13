@@ -47,7 +47,7 @@ export class AnimatedSprite extends Sprite implements IMessageHandler {
   private _frameWidth: number;
   private _frameHeight: number;
   private _frameCount: number;
-  private _frameSequence: number[] = [];
+  private _frameSequence: number[];
 
   // TO-DO: Make these configurable
   private _currentFrame: number = 0;
