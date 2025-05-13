@@ -35,7 +35,7 @@ export class AnimatedSpriteComponentData
 
     if (json.frameWidth === undefined) {
       throw new Error(
-        `ERROR: AnimatedSpriteComponentData required 'frameWidth' to be defined`
+        `ERROR: AnimatedSpriteComponentData requires 'frameWidth' to be defined`
       );
     } else {
       this.frameWidth = Number(json.frameWidth);
