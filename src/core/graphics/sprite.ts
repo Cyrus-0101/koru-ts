@@ -126,7 +126,7 @@ export class Sprite {
 
   public set origin(value: Vector3) {
     this._origin = value;
-    this.calculateVertices();
+    this.recalculateVertices();
   }
 
   /**
