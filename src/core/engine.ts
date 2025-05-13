@@ -123,7 +123,7 @@ export class KoruTSEngine implements IMessageHandler {
 
     // Register material managers
     MaterialManager.registerMaterial(
-      new Material("crate", "assets/textures/crate.jpg", Color.white())
+      new Material("grass", "assets/textures/grass.png", Color.white())
     );
 
     MaterialManager.registerMaterial(
