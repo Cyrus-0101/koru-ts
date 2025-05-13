@@ -43,7 +43,7 @@ export abstract class BaseComponent implements IComponent {
    * Sets owning object reference
    * @param owner SimObject that owns this component
    */
-  public setOwner(owner: SimObject) {
+  public setOwner(owner: SimObject): void {
     this._owner = owner;
   }
 
