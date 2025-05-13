@@ -1,6 +1,7 @@
 import type { Shader } from "../gl/shaders";
 import { AnimatedSprite } from "../graphics/animatedSprite";
 import { Sprite } from "../graphics/sprite";
+import { Vector3 } from "../math/vector3";
 import { BaseComponent } from "./baseComponent";
 import type { IComponent } from "./IComponent";
 import type { IComponentBuilder } from "./IComponentBuilder";
@@ -114,6 +115,8 @@ export class AnimatedSpriteComponent extends BaseComponent {
   /** Managed sprite instance */
   private _sprite: AnimatedSprite;
 
+  private _autoPlay: boolean;
+
   /**
    * Creates new sprite component
    * @param name Component identifier
@@ -121,6 +124,8 @@ export class AnimatedSpriteComponent extends BaseComponent {
    */
   public constructor(data: AnimatedSpriteComponentData) {
     super(data);
+
+    this._autoPlay = data.autoPlay;
 
     this._sprite = new AnimatedSprite(
       data.name,
@@ -132,6 +137,23 @@ export class AnimatedSpriteComponent extends BaseComponent {
       data.frameCount,
       data.frameSequence
     );
+
+    // Fixes bug since AnimatedSprite overwrites the super class
+    if (!data.origin.equals(Vector3.zero)) {
+      this._sprite.origin.copyFrom(data.origin);
+    }
+  }
+
+  public isPlaying(): boolean {
+    return this._sprite.isPlaying();
+  }
+
+  public play(): void {
+    this._sprite.play();
+  }
+
+  public stop(): void {
+    this._sprite.stop();
   }
 
   /**
@@ -142,10 +164,20 @@ export class AnimatedSpriteComponent extends BaseComponent {
     this._sprite.load();
   }
 
+  public updateReady(): void {
+    if (!this._autoPlay) {
+      this._sprite.stop();
+    }
+  }
+
   public update(time: number): void {
     this._sprite.update(time);
 
     super.update(time);
+  }
+
+  public setFrame(frameNumber: number): void {
+    this._sprite.setFrame(frameNumber);
   }
 
   /**
