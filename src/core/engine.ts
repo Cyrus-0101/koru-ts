@@ -108,7 +108,7 @@ export class KoruTSEngine implements IMessageHandler {
     BehaviourManager.registerBuilder(new KeyboardMovementBehaviourBuilder());
 
     // Set default background color to black (R=0, G=0, B=0, A=1)
-    gl.clearColor(0, 0, 0.3, 1);
+    gl.clearColor(146 / 255, 206 / 255, 247 / 255, 1);
 
     // Make background blend - remove background
     gl.enable(gl.BLEND);
