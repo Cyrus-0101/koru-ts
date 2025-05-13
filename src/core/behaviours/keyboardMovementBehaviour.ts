@@ -28,9 +28,9 @@ export class KeyboardMovementBehaviourData implements IBehaviourData {
     }
 
     this.name = String(json.name);
-    this.speed = Number(json.speed);
 
     if (json.speed !== undefined) {
+      this.speed = Number(json.speed);
     }
   }
 }
