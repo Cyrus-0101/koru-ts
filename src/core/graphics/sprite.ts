@@ -180,14 +180,11 @@ export class Sprite {
     // Set color tint (currently orange)
     let colorLocation = shader.getUniformLocation("u_tint");
 
-    gl.uniform4fv(
-      colorLocation,
-      this._material?.tint?.toFloat32Array() ?? new Float32Array([1, 0.5, 0, 1])
-    ); // Default to orange if no material/tint
+    gl.uniform4fv(colorLocation, this._material!.tint!.toFloat32Array());
 
-    if (this._material?.diffuseTexture !== undefined) {
+    if (this._material!.diffuseTexture !== undefined) {
       // Activate and bind texture for this sprite
-      this._material.diffuseTexture.activateAndBind(0);
+      this._material!.diffuseTexture.activateAndBind(0);
 
       // u_diffuse in fragment shader samples from this unit
       let diffuseLocation = shader.getUniformLocation("u_diffuse");
@@ -202,11 +199,11 @@ export class Sprite {
   }
 
   protected calculateVertices(): void {
-    let minX = -(this._width * this.origin.x);
+    let minX = -(this._width * this._origin.x);
 
     let maxX = this._width * (1.0 - this._origin.x);
 
-    let minY = -(this._height * this.origin.y);
+    let minY = -(this._height * this._origin.y);
 
     let maxY = this._height * (1.0 - this._origin.y);
 
@@ -276,11 +273,11 @@ export class Sprite {
    * Recalculates the position of all the vertices
    */
   protected recalculateVertices(): void {
-    let minX = -(this._width * this.origin.x);
+    let minX = -(this._width * this._origin.x);
 
     let maxX = this._width * (1.0 - this._origin.x);
 
-    let minY = -(this._height * this.origin.y);
+    let minY = -(this._height * this._origin.y);
 
     let maxY = this._height * (1.0 - this._origin.y);
 
