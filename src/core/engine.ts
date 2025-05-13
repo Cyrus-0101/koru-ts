@@ -18,7 +18,8 @@ import type { IMessageHandler } from "./message/IMessageHandler";
 import { Message } from "./message/message";
 import { MessageBus } from "./message/messageBus";
 import { ZoneManager } from "./world/zoneManager";
-import { BasicShader } from "./shaders/basicShader";
+import { BasicShader } from "./gl/shaders/basicShader";
+import { PlayerBehaviourBuilder } from "./behaviours/playerBehaviour";
 
 /**
  * Core game engine class implementing the main game loop and systems management
@@ -106,6 +107,7 @@ export class KoruTSEngine implements IMessageHandler {
     // Register Behaviours
     BehaviourManager.registerBuilder(new RotationBehaviourBuilder());
     BehaviourManager.registerBuilder(new KeyboardMovementBehaviourBuilder());
+    BehaviourManager.registerBuilder(new PlayerBehaviourBuilder());
 
     // Set default background color to black (R=0, G=0, B=0, A=1)
     gl.clearColor(146 / 255, 206 / 255, 247 / 255, 1);
