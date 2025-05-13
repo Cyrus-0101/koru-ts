@@ -1,3 +1,5 @@
+import { Vector3 } from "./vector3";
+
 /**
  * Vector2 - Represents a 2D vector with x, y components
  *
@@ -102,6 +104,20 @@ export class Vector2 {
     }
   }
 
+  public set(x?: number, y?: number): void {
+    if (x !== undefined) {
+      this._x = x;
+    }
+
+    if (y !== undefined) {
+      this._y = y;
+    }
+  }
+
+  public toVector(): Vector3 {
+    return new Vector3(this._x, this._y, 0);
+  }
+
   /**
    * Adds another vector to this one (component-wise)
    * Modifies the current vector in place
@@ -166,5 +182,12 @@ export class Vector2 {
    */
   public clone(): Vector2 {
     return new Vector2(this._x, this._y);
+  }
+
+  public scale(scale: number): Vector2 {
+    this._x *= scale;
+    this._y *= scale;
+
+    return this;
   }
 }

@@ -65,6 +65,9 @@ export class AnimatedSprite extends Sprite implements IMessageHandler {
 
   private _assetHeight: number = 2;
 
+  /** Stopping or playing the animation */
+  private _isPlaying: boolean = true;
+
   /**
    * Creates a new sprite instance
    * @param name Unique identifier for this sprite
@@ -95,6 +98,31 @@ export class AnimatedSprite extends Sprite implements IMessageHandler {
       MESSAGE_ASSET_LOADER_ASSET_LOADED + this._material?.diffuseTextureName,
       this
     );
+  }
+
+  /**
+   * Indicates if this animated sprite is currently playing
+   */
+  public isPlaying(): boolean {
+    return this._isPlaying;
+  }
+
+  public play(): void {
+    this._isPlaying = true;
+  }
+
+  public stop(): void {
+    this._isPlaying = false;
+  }
+
+  public setFrame(frameNumber: number): void {
+    if (frameNumber >= this._frameCount) {
+      throw new Error(
+        `ERROR: Frame is out of range: \nFrame Number'${frameNumber}' \nFrame Count: '${this._frameCount}'`
+      );
+    }
+
+    this._currentFrame = frameNumber;
   }
 
   /**
@@ -183,6 +211,12 @@ export class AnimatedSprite extends Sprite implements IMessageHandler {
 
       return;
     }
+
+    // Stop the animation
+    if (!this._isPlaying) {
+      return;
+    }
+
     this._currentTime += time;
 
     if (this._currentTime > this._frameTime) {

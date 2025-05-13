@@ -57,6 +57,8 @@ export abstract class BaseComponent implements IComponent {
   /** Loads component resources */
   public load(): void {}
 
+  public updateReady(): void {}
+
   /**
    * Updates component state
    * @param time Current engine time in milliseconds

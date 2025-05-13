@@ -47,6 +47,8 @@ export abstract class BaseBehaviour implements IBehaviour {
     this._owner = owner;
   }
 
+  public updateReady(): void {}
+
   /**
    * Updates behaviour state
    * @param time Current engine time in milliseconds

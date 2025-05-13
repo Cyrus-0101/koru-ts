@@ -126,6 +126,8 @@ export class Zone {
 
     this._scene.load();
 
+    this._scene.root.updateReady();
+
     this._state = ZoneState.UPDATING;
   }
 

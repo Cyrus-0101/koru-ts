@@ -116,6 +116,52 @@ export class SimObject {
   }
 
   /**
+   * Recursively searches for behaviour by name
+   * @param name Name to search for
+   * @returns Found behaviour or undefined
+   */
+  public getBehaviourByName(name: string): IBehaviour | undefined {
+    for (let behaviour of this._behaviours) {
+      if (behaviour.name === name) {
+        return behaviour;
+      }
+    }
+
+    for (let child of this._children) {
+      let behaviour = child.getBehaviourByName(name);
+
+      if (behaviour !== undefined) {
+        return behaviour;
+      }
+
+      return undefined;
+    }
+  }
+
+  /**
+   * Recursively searches for component by name
+   * @param name Name to search for
+   * @returns Found component or undefined
+   */
+  public getComponentByName(name: string): IComponent | undefined {
+    for (let component of this._components) {
+      if (component.name === name) {
+        return component;
+      }
+    }
+
+    for (let child of this._children) {
+      let component = child.getComponentByName(name);
+
+      if (component !== undefined) {
+        return component;
+      }
+
+      return undefined;
+    }
+  }
+
+  /**
    * Recursively searches for object by name
    * @param name Name to search for
    * @returns Found object or undefined
@@ -170,6 +216,23 @@ export class SimObject {
     }
   }
 
+  public updateReady(): void {
+    // UpdateReady components
+    for (let c of this._components) {
+      c.updateReady();
+    }
+
+    // UpdateReady behavviours
+    for (let b of this._behaviours) {
+      b.updateReady();
+    }
+
+    // UpdateReady children
+    for (let c of this._children) {
+      c.updateReady();
+    }
+  }
+
   /**
    * Updates object state
    * Order:
@@ -193,7 +256,7 @@ export class SimObject {
       c.update(time);
     }
 
-    // Update components
+    // Update behaviours
     for (let b of this._behaviours) {
       b.update(time);
     }
