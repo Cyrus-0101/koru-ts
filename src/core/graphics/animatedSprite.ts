@@ -84,7 +84,7 @@ export class AnimatedSprite extends Sprite implements IMessageHandler {
     height: number = 100,
     frameWidth: number = 10,
     frameHeight: number = 10,
-    frameCount: number = 10,
+    frameCount: number = 1,
     frameSequence: number[] = []
   ) {
     super(name, materialName, width, height);
