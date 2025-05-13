@@ -114,7 +114,7 @@ export class Vector2 {
     }
   }
 
-  public toVector(): Vector3 {
+  public toVector3(): Vector3 {
     return new Vector3(this._x, this._y, 0);
   }
 
