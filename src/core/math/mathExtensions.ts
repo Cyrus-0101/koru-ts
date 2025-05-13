@@ -33,9 +33,11 @@ declare global {
  * @param min Minimum allowed value
  * @param max Maximum allowed value
  */
-Math.clamp = function (value: number, min: number, max: number): number {
+Math.clamp = (value: number, min: number, max: number): number => {
   if (value < min) return min;
+
   if (value > max) return max;
+
   return value;
 };
 
@@ -43,7 +45,7 @@ Math.clamp = function (value: number, min: number, max: number): number {
  * Converts degrees to radians
  * @param degrees Angle in degrees
  */
-Math.degToRad = function (degrees: number): number {
+Math.degToRad = (degrees: number): number => {
   return (degrees * Math.PI) / 180;
 };
 
@@ -51,7 +53,7 @@ Math.degToRad = function (degrees: number): number {
  * Converts radians to degrees
  * @param radians Angle in radians
  */
-Math.radToDeg = function (radians: number): number {
+Math.radToDeg = (radians: number): number => {
   return (radians * 180) / Math.PI;
 };
 
