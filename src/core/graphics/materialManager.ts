@@ -84,6 +84,7 @@ export class MaterialManager {
       );
     } else {
       MaterialManager._materials[materialName].referenceCount--;
+
       if (MaterialManager._materials[materialName].referenceCount < 1) {
         MaterialManager._materials[materialName].material.destroy();
 
