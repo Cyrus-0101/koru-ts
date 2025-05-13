@@ -1,6 +1,6 @@
-import { fragmentShaderSource } from "../../shaders/basic.frag";
-import { vertexShaderSource } from "../../shaders/basic.vert";
-import { Shader } from "../shaders";
+import { Shader } from "../gl/shaders";
+import { fragmentShaderSource } from "./basic.frag";
+import { vertexShaderSource } from "./basic.vert";
 
 /**
  * BasicShader - Default shader implementation for 2D rendering

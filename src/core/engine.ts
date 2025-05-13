@@ -9,7 +9,6 @@ import { CollisionManager } from "./collision/collisionManager";
 import { KeyboardMovementBehaviourBuilder } from "./behaviours/keyboardMovementBehaviour";
 import { RotationBehaviourBuilder } from "./behaviours/rotationBehaviour";
 import { gl, GLUtilities } from "./gl/gl";
-import { BasicShader } from "./gl/shaders/basicShader";
 import { Color } from "./graphics/color";
 import { Material } from "./graphics/material";
 import { MaterialManager } from "./graphics/materialManager";
@@ -19,6 +18,7 @@ import type { IMessageHandler } from "./message/IMessageHandler";
 import { Message } from "./message/message";
 import { MessageBus } from "./message/messageBus";
 import { ZoneManager } from "./world/zoneManager";
+import { BasicShader } from "./shaders/basicShader";
 
 /**
  * Core game engine class implementing the main game loop and systems management
