@@ -43,7 +43,7 @@ export class AnimatedSpriteComponentData
 
     if (json.frameHeight === undefined) {
       throw new Error(
-        `ERROR: AnimatedSpriteComponentData required 'frameHeight' to be defined`
+        `ERROR: AnimatedSpriteComponentData requires 'frameHeight' to be defined`
       );
     } else {
       this.frameHeight = Number(json.frameHeight);
@@ -51,7 +51,7 @@ export class AnimatedSpriteComponentData
 
     if (json.frameCount === undefined) {
       throw new Error(
-        `ERROR: AnimatedSpriteComponentData required 'frameCount' to be defined`
+        `ERROR: AnimatedSpriteComponentData requires 'frameCount' to be defined`
       );
     } else {
       this.frameCount = Number(json.frameCount);
@@ -59,7 +59,7 @@ export class AnimatedSpriteComponentData
 
     if (json.frameSequence === undefined) {
       throw new Error(
-        `ERROR: AnimatedSpriteComponentData required 'frameSequence' to be defined`
+        `ERROR: AnimatedSpriteComponentData requires 'frameSequence' to be defined`
       );
     } else {
       this.frameSequence = json.frameSequence;
