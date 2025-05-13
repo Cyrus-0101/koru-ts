@@ -220,7 +220,7 @@ export class GLBuffer {
         break;
 
       case gl.SHORT:
-        bufferData = new Uint16Array(this._data);
+        bufferData = new Int16Array(this._data);
         break;
 
       case gl.UNSIGNED_SHORT:
