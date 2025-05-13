@@ -1,27 +1,58 @@
-/** Complementary functions on top of JavaScript's Math lib */
-interface Math {
-  clamp(value: number, min: number, max: number): number;
-  degToRad(degrees: number): number;
-  radToDeg(radians: number): number;
+// math-extensions.d.ts
+
+/**
+ * Extends the built-in Math object with additional utility methods
+ */
+declare global {
+  interface Math {
+    /**
+     * Clamps a number between min and max
+     * @param value The input number
+     * @param min Minimum allowed value
+     * @param max Maximum allowed value
+     */
+    clamp(value: number, min: number, max: number): number;
+
+    /**
+     * Converts degrees to radians
+     * @param degrees Angle in degrees
+     */
+    degToRad(degrees: number): number;
+
+    /**
+     * Converts radians to degrees
+     * @param radians Angle in radians
+     */
+    radToDeg(radians: number): number;
+  }
 }
 
-/** Hacky way of adding our clamp to the Math lib in TS */
-(Math as any).clamp = (value: number, min: number, max: number): number => {
-  if (value < min) {
-    return min;
-  }
-
-  if (value > max) {
-    return max;
-  }
-
+/**
+ * Clamps a number between min and max
+ * @param value The input number
+ * @param min Minimum allowed value
+ * @param max Maximum allowed value
+ */
+Math.clamp = function (value: number, min: number, max: number): number {
+  if (value < min) return min;
+  if (value > max) return max;
   return value;
 };
 
-(Math as any).degToRad = (degrees: number): number => {
-  return (degrees * Math.PI) / 180.0;
+/**
+ * Converts degrees to radians
+ * @param degrees Angle in degrees
+ */
+Math.degToRad = function (degrees: number): number {
+  return (degrees * Math.PI) / 180;
 };
 
-(Math as any).radToDeg = (degrees: number): number => {
-  return (degrees * 180.0) / Math.PI;
+/**
+ * Converts radians to degrees
+ * @param radians Angle in radians
+ */
+Math.radToDeg = function (radians: number): number {
+  return (radians * 180) / Math.PI;
 };
+
+export {}; // Important: marks this file as a module
