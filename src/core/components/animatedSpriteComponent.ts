@@ -23,9 +23,14 @@ export class AnimatedSpriteComponentData
   public frameHeight!: number;
   public frameCount!: number;
   public frameSequence: number[] = [];
+  public autoPlay: boolean = true;
 
   public setFromJson(json: any): void {
     super.setFromJson(json);
+
+    if (json.autoPlay !== undefined) {
+      this.autoPlay = Boolean(json.autoPlay);
+    }
 
     if (json.frameWidth === undefined) {
       throw new Error(
