@@ -191,9 +191,4 @@ export class AnimatedSpriteComponent extends BaseComponent {
     // Render parent content
     super.render(shader);
   }
-
-  /** Gets managed sprite instance */
-  public get sprite(): Sprite {
-    return this._sprite;
-  }
 }
