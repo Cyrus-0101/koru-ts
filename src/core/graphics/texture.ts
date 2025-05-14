@@ -59,8 +59,6 @@ export class Texture implements IMessageHandler {
 
     this._handle = gl.createTexture();
 
-    Message.subscribe(MESSAGE_ASSET_LOADER_ASSET_LOADED + this._name, this);
-
     this.bind();
 
     // Used when loading raw data to the texture
@@ -81,6 +79,8 @@ export class Texture implements IMessageHandler {
 
     if (asset !== undefined) {
       this.loadTextureFromAsset(asset);
+    } else {
+      Message.subscribe(MESSAGE_ASSET_LOADER_ASSET_LOADED + this._name, this);
     }
   }
 
