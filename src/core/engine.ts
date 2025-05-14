@@ -162,14 +162,11 @@ export class KoruTSEngine implements IMessageHandler {
       100.0
     );
 
-    // TEMPORARY: TO-DO: Change this to read from a game config later
-    ZoneManager.changeZone(0);
-
     // Configure initial viewport and canvas size
     this.resize();
 
     // Start the main game loop
-    this.loop();
+    this.preLoading();
   }
 
   public onMessage(message: Message): void {
@@ -196,6 +193,55 @@ export class KoruTSEngine implements IMessageHandler {
     this.update();
 
     this.render();
+
+    requestAnimationFrame(this.loop.bind(this));
+  }
+
+  private preLoading(): void {
+    // Make sure to always update the message bus.
+    MessageBus.update(0);
+
+    if (!BitmapFontManager.updateReady()) {
+      requestAnimationFrame(this.preLoading.bind(this));
+      return;
+    }
+
+    // TEMPORARY: TO-DO: Change this to read from a game config later
+    // Load up our zone
+    ZoneManager.changeZone(0);
+
+    // Kick off the render loop.
+    this.loop();
+  }
+
+  /**
+   * Handles window resize events
+   *
+   * Updates:
+   * - Canvas dimensions
+   * - WebGL viewport
+   * - Projection matrix
+   *
+   * Note: Called automatically on window resize
+   */
+  public resize(): void {
+    if (this._canvas !== undefined) {
+      if (this._gameWidth === undefined || this._gameHeight === undefined) {
+        this._canvas.width = window.innerWidth;
+        this._canvas.height = window.innerHeight;
+      }
+
+      gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+      this._projection = Matrix4x4.orthographic(
+        0,
+        this._canvas.width,
+        this._canvas.height,
+        0,
+        -100.0,
+        100.0
+      );
+    }
   }
 
   private update(): void {
@@ -228,39 +274,5 @@ export class KoruTSEngine implements IMessageHandler {
       false,
       new Float32Array(this._projection.data)
     );
-
-    // Schedule next frame using requestAnimationFrame
-    // bind(this) ensures correct 'this' context in the callback
-    requestAnimationFrame(this.loop.bind(this));
-  }
-
-  /**
-   * Handles window resize events
-   *
-   * Updates:
-   * - Canvas dimensions
-   * - WebGL viewport
-   * - Projection matrix
-   *
-   * Note: Called automatically on window resize
-   */
-  public resize(): void {
-    if (this._canvas !== undefined) {
-      if (this._gameWidth === undefined || this._gameHeight === undefined) {
-        this._canvas.width = window.innerWidth;
-        this._canvas.height = window.innerHeight;
-      }
-
-      gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
-      this._projection = Matrix4x4.orthographic(
-        0,
-        this._canvas.width,
-        this._canvas.height,
-        0,
-        -100.0,
-        100.0
-      );
-    }
   }
 }
