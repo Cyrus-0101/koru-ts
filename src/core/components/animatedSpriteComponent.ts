@@ -1,6 +1,5 @@
 import type { Shader } from "../gl/shaders";
 import { AnimatedSprite } from "../graphics/animatedSprite";
-import { Sprite } from "../graphics/sprite";
 import { Vector3 } from "../math/vector3";
 import { BaseComponent } from "./baseComponent";
 import type { IComponent } from "./IComponent";
