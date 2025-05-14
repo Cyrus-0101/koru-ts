@@ -9,20 +9,32 @@ import type { IComponentBuilder } from "./IComponentBuilder";
 import type { IComponentData } from "./IComponentData";
 
 /**
- * Component data for collision configuration
- * Stores collision properties loaded from JSON
+ * CollisionComponentData - Configuration data for collision component
+ *
+ * Stores collision properties loaded from JSON.
  *
  * Properties:
- * - name: Collision identifier
- * - shape: Associated shapeType
+ * - name: Unique identifier for this collision component
+ * - shape: Reference to a 2D shape (Rectangle2D or Circle2D)
+ * - static: Whether the object is static (does not move)
  */
 export class CollisionComponentData implements IComponentData {
   public name!: string;
   public shape!: IShape2D;
+  public static: boolean = true;
 
+  /**
+   * Loads configuration from JSON
+   * @param json Source configuration data
+   * @throws Error if required fields are missing
+   */
   public setFromJson(json: any): void {
     if (json.name !== undefined) {
       this.name = String(json.name);
+    }
+
+    if (json.static !== undefined) {
+      this.static = Boolean(json.static);
     }
 
     if (json.shape === undefined) {
@@ -59,26 +71,35 @@ export class CollisionComponentData implements IComponentData {
 }
 
 /**
- * Builder for creating collision components from JSON data
- * Handles deserialization of collision configuration
+ * CollisionComponentBuilder - Constructs collision components from JSON
  *
- * @implements {IComponentBuilder}
+ * Implements:
+ * - IComponentBuilder interface
  *
- * @example
+ * Usage:
+ * ```typescript
  * const builder = new CollisionComponentBuilder();
- * const collision = builder.buildFromJson({
- *   name: "player",
+ * const component = builder.buildFromJson({
+ *   name: "playerCollision",
  *   type: "collision",
- *   ...
+ *   shape: {
+ *     type: "circle",
+ *     radius: 10
+ *   }
  * });
+ * ```
  */
 export class CollisionComponentBuilder implements IComponentBuilder {
-  // Type that builder handles
-  // Taking a section of data and constructing the component using the data
+  /** @returns "collision" type identifier */
   public get type(): string {
     return "collision";
   }
 
+  /**
+   * Constructs a collision component from JSON config
+   * @param json Configuration data
+   * @returns New CollisionComponent instance
+   */
   public buildFromJson(json: any): IComponent {
     let data = new CollisionComponentData();
 
@@ -89,78 +110,116 @@ export class CollisionComponentBuilder implements IComponentBuilder {
 }
 
 /**
- * CollisionComponent - Handles collision rendering for game objects
+ * CollisionComponent - Handles physics and collision detection for game objects
  *
  * Features:
- * - Collision management
+ * - Manages collision shapes (rectangles, circles)
+ * - Registers with global collision manager
+ * - Tracks position relative to owner
+ * - Provides hooks for entry/update/exit events
  *
  * Usage:
  * ```typescript
- * const shape = new CollisionComponent("circle2D");
- * const otherShape = new CollisionComponent("rectangle2D");
- *
- * shape.onCollisionEntry(otherShape);
+ * const comp = new CollisionComponent(data);
+ * comp.onCollisionEntry(other);
  * ```
  */
 export class CollisionComponent extends BaseComponent {
-  /** Managed shape instance */
+  /** Managed shape instance used for collision detection */
   private _shape: IShape2D;
 
+  /** Flag indicating whether this component is static (non-moving) */
+  private _static: boolean;
+
   /**
-   * Creates new collision component
-   * @param data Collision component data
+   * Creates a new collision component
+   * @param data Configuration data
    */
   public constructor(data: CollisionComponentData) {
     super(data);
 
     this._shape = data.shape;
+    this._static = data.static;
   }
 
-  /** Gets managed shape instance */
+  /**
+   * Gets the managed shape instance
+   * @returns Shape used for collision detection
+   */
   public get shape(): IShape2D {
     return this._shape;
   }
 
+  /**
+   * Gets whether this component is static
+   * @returns True if component does not move
+   */
+  public get isStatic(): boolean {
+    return this._static;
+  }
+
+  /**
+   * Called when component is loaded into the scene
+   */
   public load(): void {
     super.load();
 
-    // TO-DO: Need to rewrite to cater for nested objects. Super hacky
-    this.shape.position.copyFrom(
-      this.owner.transform.position.toVector2().add(this._shape.offset)
+    // Position shape based on owner's world position
+    this._shape.position.copyFrom(
+      this.owner.getWorldPosition().toVector2().subtract(this._shape.offset)
     );
 
+    // Register with global collision manager
     CollisionManager.registerCollisionComponent(this);
   }
 
+  /**
+   * Updates shape position each frame
+   * @param time Current engine time in milliseconds
+   */
   public update(time: number): void {
-    // TO-DO: Need to rewrite to cater for nested objects. Super hacky
-    this.shape.position.copyFrom(
-      this.owner.transform.position.toVector2().add(this._shape.offset)
+    this._shape.position.copyFrom(
+      this.owner.getWorldPosition().toVector2().subtract(this._shape.offset)
     );
 
     super.update(time);
   }
 
   /**
-   * Render debug function
+   * Render debug visualization of the collision shape
    * @param shader Shader to use for rendering
    */
   public render(shader: Shader): void {
-    // this._sprite.draw(shader, this.owner.worldMatrix);
+    // Debug drawing would go here
 
     // Render parent content
     super.render(shader);
   }
 
+  /**
+   * Called when a collision starts
+   * @param other Colliding component
+   */
   public onCollisionEntry(other: CollisionComponent): void {
     // console.log("onCollisionEntry", this, other);
+    // Optional override point
   }
 
+  /**
+   * Called while a collision is ongoing
+   * @param other Colliding component
+   */
   public onCollisionUpdate(other: CollisionComponent): void {
     // console.log("onCollisionUpdate", this, other);
+    // Optional override point
   }
 
+  /**
+   * Called when a collision ends
+   * @param other Colliding component
+   */
   public onCollisionExit(other: CollisionComponent): void {
     // console.log("onCollisionExit", this, other);
+    // Optional override point
   }
 }
