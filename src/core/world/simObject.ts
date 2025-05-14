@@ -4,6 +4,7 @@ import type { Shader } from "../gl/shaders";
 import { Matrix4x4 } from "../math/matrix4x4";
 import { Transform } from "../math/transform";
 import type { Scene } from "./scene";
+import { Vector3 } from "../math/vector3";
 
 /**
  * SimObject - Base class for all game objects in the simulation
@@ -329,5 +330,13 @@ export class SimObject {
       // Root object - world equals local
       this._worldMatrix.copyFrom(this._localMatrix);
     }
+  }
+
+  public getWorldPosition(): Vector3 {
+    return new Vector3(
+      this._worldMatrix.data[12],
+      this._worldMatrix.data[13],
+      this._worldMatrix.data[14]
+    );
   }
 }
