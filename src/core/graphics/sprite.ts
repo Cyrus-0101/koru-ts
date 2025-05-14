@@ -50,8 +50,10 @@ export class Sprite {
   /** Identifier for material lookup */
   protected _materialName: string | undefined;
 
+  /** Array of vertices used to construct the quad geometry */
   protected _vertices: Vertex[] = [];
 
+  /** Origin point for alignment within the sprite bounds */
   protected _origin: Vector3 = Vector3.zero;
 
   /**
@@ -103,7 +105,7 @@ export class Sprite {
 
     texCoordAttributes.location = 1;
 
-    // Each position has 3 components (U, V or x, y)
+    // Each texture coordinate has 3 components (U, V or x, y)
     texCoordAttributes.size = 2;
 
     // Register attribute with buffer for automatic setup during binding
@@ -120,15 +122,36 @@ export class Sprite {
     return this._name;
   }
 
+  /**
+   * Gets the origin point used for aligning the sprite
+   * @returns Origin as Vector3
+   */
   public get origin(): Vector3 {
     return this._origin;
   }
 
+  /**
+   * Sets the origin point used for aligning the sprite
+   * Triggers vertex recalculation when changed
+   * @param value New origin vector
+   */
   public set origin(value: Vector3) {
     this._origin = value;
-
     this.recalculateVertices();
   }
+
+  /**
+   * Gets the width of the sprite
+   * @returns Width in units
+   */
+  public get width(): number {
+    return this._width;
+  }
+
+  /**
+   * Gets the height of the sprite
+   * @returns Height in units
+   */
 
   /**
    * Cleans up sprite resources
@@ -167,6 +190,7 @@ export class Sprite {
    * 5. Draw vertex buffer
    *
    * @param shader Shader to use for rendering
+   * @param model Model transformation matrix
    */
   public draw(shader: Shader, model: Matrix4x4): void {
     // Update model matrix with current position
@@ -199,6 +223,11 @@ export class Sprite {
     this._buffer.draw();
   }
 
+  /**
+   * Generates quad geometry based on size and origin
+   * Builds two triangles to form a rectangle
+   * Applies UV mapping from bottom-left to top-right
+   */
   protected calculateVertices(): void {
     let minX = -(this._width * this._origin.x);
 
@@ -272,6 +301,7 @@ export class Sprite {
 
   /**
    * Recalculates the position of all the vertices
+   * Used when origin changes to re-center the sprite
    */
   protected recalculateVertices(): void {
     let minX = -(this._width * this._origin.x);
@@ -282,12 +312,12 @@ export class Sprite {
 
     let maxY = this._height * (1.0 - this._origin.y);
 
-    // First triangle (bottom-left, top-left, top-right - x,y,z)  (U, V)
+    // First triangle (bottom-left, top-left, top-right)
     this._vertices[0].position.set(minX, minY);
     this._vertices[1].position.set(minX, maxY);
     this._vertices[2].position.set(maxX, maxY);
-    // Second triangle (top-right, bottom-right, bottom-left)
 
+    // Second triangle (top-right, bottom-right, bottom-left)
     this._vertices[3].position.set(maxX, maxY);
     this._vertices[4].position.set(maxX, minY);
     this._vertices[5].position.set(minX, minY);
