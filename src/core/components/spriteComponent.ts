@@ -60,12 +60,16 @@ export class SpriteComponentData implements IComponentData {
  * });
  */
 export class SpriteComponentBuilder implements IComponentBuilder {
-  // Type that builder handles
-  // Taking a section of data and constructing the component using the data
+  /** @returns "sprite" type identifier */
   public get type(): string {
     return "sprite";
   }
 
+  /**
+   * Constructs a sprite component from JSON config
+   * @param json Configuration data
+   * @returns New Spritecomponent instance
+   */
   public buildFromJson(json: any): IComponent {
     let data = new SpriteComponentData();
 
