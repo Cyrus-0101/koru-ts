@@ -34,11 +34,33 @@ export class JsonAsset implements IAsset {
   }
 }
 
+/**
+ * JsonAssetLoader - Handles loading of JSON assets
+ *
+ * Features:
+ * - Async JSON loading
+ * - JSON format support
+ * - Asset manager integration
+ *
+ * Usage:
+ * ```typescript
+ * const loader = new JsonAssetLoader();
+ * loader.loadAsset("assets/testZone.json");
+ * ```
+ */
 export class JsonAssetLoader implements IAssetLoader {
+  /**
+   * Gets supported file extensions
+   * @returns Array of supported extensions
+   */
   public get supportedExtensions(): string[] {
     return ["json"];
   }
 
+  /**
+   * Starts async JSON loading
+   * @param assetName Path to JSON file
+   */
   public loadAsset(assetName: string): void {
     let request: XMLHttpRequest = new XMLHttpRequest();
 
@@ -52,6 +74,12 @@ export class JsonAssetLoader implements IAssetLoader {
     request.send();
   }
 
+  /**
+   * Handles JSON load completion
+   * Creates asset and notifies manager
+   * @param assetName Original asset path
+   * @param request ResponseText loaded JSON asset
+   */
   private onJsonLoaded(assetName: string, request: XMLHttpRequest) {
     console.info("LOG: onJSONLoaded: assetName/request", assetName, request);
 
