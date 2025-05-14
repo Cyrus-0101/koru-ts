@@ -20,6 +20,7 @@ import { MessageBus } from "./message/messageBus";
 import { ZoneManager } from "./world/zoneManager";
 import { BasicShader } from "./gl/shaders/basicShader";
 import { PlayerBehaviourBuilder } from "./behaviours/playerBehaviour";
+import { ScrollBehaviourBuilder } from "./behaviours/scrollBehaviour";
 
 /**
  * Core game engine class implementing the main game loop and systems management
@@ -108,6 +109,7 @@ export class KoruTSEngine implements IMessageHandler {
     BehaviourManager.registerBuilder(new RotationBehaviourBuilder());
     BehaviourManager.registerBuilder(new KeyboardMovementBehaviourBuilder());
     BehaviourManager.registerBuilder(new PlayerBehaviourBuilder());
+    BehaviourManager.registerBuilder(new ScrollBehaviourBuilder());
 
     // Set default background color to black (R=0, G=0, B=0, A=1)
     gl.clearColor(146 / 255, 206 / 255, 247 / 255, 1);
@@ -123,9 +125,17 @@ export class KoruTSEngine implements IMessageHandler {
 
     // Register material managers
     MaterialManager.registerMaterial(
+      new Material("bg", "assets/textures/bg.png", Color.white())
+    );
+    MaterialManager.registerMaterial(
+      new Material("end", "assets/textures/end.png", Color.white())
+    );
+    MaterialManager.registerMaterial(
+      new Material("middle", "assets/textures/middle.png", Color.white())
+    );
+    MaterialManager.registerMaterial(
       new Material("grass", "assets/textures/grass.png", Color.white())
     );
-
     MaterialManager.registerMaterial(
       new Material("duck", "assets/textures/duck.png", Color.white())
     );
