@@ -36,7 +36,7 @@ export class SimObject {
   private _isLoaded: boolean = false;
 
   /** Reference to containing scene */
-  private _scene: Scene | undefined;
+  private _scene?: Scene;
 
   /** List of attached components */
   private _components: IComponent[] = [];
@@ -110,7 +110,9 @@ export class SimObject {
    */
   public removeChild(child: SimObject): void {
     let index = this._children.indexOf(child);
+
     if (index !== -1) {
+      child._parent = undefined;
       this._children.splice(index, 1);
     }
   }
@@ -189,11 +191,13 @@ export class SimObject {
    */
   public addComponent(component: IComponent): void {
     this._components.push(component);
+
     component.setOwner(this);
   }
 
   public addBehavour(behaviour: IBehaviour): void {
     this._behaviours.push(behaviour);
+
     behaviour.setOwner(this);
   }
 
