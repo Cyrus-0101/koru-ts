@@ -21,6 +21,8 @@ import { ZoneManager } from "./world/zoneManager";
 import { BasicShader } from "./gl/shaders/basicShader";
 import { PlayerBehaviourBuilder } from "./behaviours/playerBehaviour";
 import { ScrollBehaviourBuilder } from "./behaviours/scrollBehaviour";
+import { BitmapFontManager } from "./graphics/bitmaps/bitMapFontManager";
+import { BitmapTextComponentBuilder } from "./components/bitMapTextComponent";
 
 /**
  * Core game engine class implementing the main game loop and systems management
@@ -100,10 +102,15 @@ export class KoruTSEngine implements IMessageHandler {
     // Initialize ZoneManager
     ZoneManager.initialize();
 
+    // Load fonts
+    BitmapFontManager.addFont("default", "assets/fonts/text.txt");
+    BitmapFontManager.load();
+
     // Register Builders
     ComponentManager.registerBuilder(new SpriteComponentBuilder());
     ComponentManager.registerBuilder(new AnimatedSpriteComponentBuilder());
     ComponentManager.registerBuilder(new CollisionComponentBuilder());
+    ComponentManager.registerBuilder(new BitmapTextComponentBuilder());
 
     // Register Behaviours
     BehaviourManager.registerBuilder(new RotationBehaviourBuilder());
